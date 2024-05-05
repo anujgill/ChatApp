@@ -12,6 +12,7 @@ export default function Login() {
     // console.log("login")
     const navigate = useNavigate();
     useEffect(() => {
+      // console.log(process.env.REACT_APP_CURRENT_USER)
         if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
           navigate("/");
         }

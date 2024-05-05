@@ -50,10 +50,7 @@ export default function ChatContainer({ currentChat, socket }) {
       to: currentChat._id,
       message: msg,
     });
-
-    const msgs = [...messages];
-    msgs.push({ fromSelf: true, message: msg });
-    setMessages(msgs);
+    setMessages((prev) => [...prev,{fromSelf:true,message:msg}]);
   };
 
   socket.current.on("msg-recieve", (msg) => {

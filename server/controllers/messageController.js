@@ -11,7 +11,7 @@ module.exports.getMessages = async (req, res) => {
 
     const projectedMessages = messages.map((msg) => {
       return {
-        fromSelf: msg.sender.toString() === from,
+        fromSelf: msg.users[0].toString() === from,
         message: msg.message.text,
       };
     });
@@ -23,7 +23,6 @@ module.exports.addMessage = async (req, res) => {
     const data = await Messages.create({
       message: { text: message },
       users: [from, to],
-      sender: from,
     });
 
     if (data) return res.json({ msg: "Message added successfully." });

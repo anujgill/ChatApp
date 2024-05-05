@@ -4,12 +4,12 @@ import axios from "axios";
 import { Buffer } from "buffer";
 import loader from "../assets/loader.gif";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { setAvatarRoute } from "../utils/Api";
 
 export default function SetAvatar() {
-  console.log("setavatar");
+  // console.log("setavatar");
   const api = `https://api.multiavatar.com/apikey=bAnJru6QS2xqBW`;
   const navigate = useNavigate();
   const [avatars, setAvatars] = useState([]);
@@ -24,7 +24,7 @@ export default function SetAvatar() {
   };
 
   useEffect( () => {
-    console.log(sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER))
+    // console.log(sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER))
     if (!sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)){
       navigate("/login");
     }
@@ -44,7 +44,7 @@ export default function SetAvatar() {
         image: avatars[selectedAvatar],
       });
 
-      console.log(data)
+      // console.log(data)
       if (data.isSet) {
         user.isAvatarImageSet = true;
         user.avatarImage = data.image;
@@ -65,7 +65,7 @@ export default function SetAvatar() {
         const fetchedAvatars = [];
         for (let i = 0; i < 4; i++) {
           const response = await axios.get(`${api}/${Math.round(Math.random() * 1000)}`);
-          const buffer = new Buffer(response.data);
+          const buffer = Buffer.from(response.data); 
           fetchedAvatars.push(buffer.toString("base64"));
         }
         setAvatars(fetchedAvatars);
@@ -96,12 +96,11 @@ export default function SetAvatar() {
                 <div
                   className={`avatar ${
                     selectedAvatar === index ? "selected" : ""
-                  }`}
+                  }`} key={index}
                 >
                   <img
                     src={`data:image/svg+xml;base64,${avatar}`}
                     alt="avatar"
-                    key={avatar}
                     onClick={() => setSelectedAvatar(index)}
                   />
                 </div>
@@ -142,6 +141,7 @@ const Container = styled.div`
     gap: 2rem;
 
     .avatar {
+      cursor: pointer;
       border: 0.4rem solid transparent;
       padding: 0.4rem;
       border-radius: 5rem;

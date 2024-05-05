@@ -11,7 +11,7 @@ export default function ChatInput({ handleSendMsg }) {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
-  const handleEmojiClick = (emojiObject, event) => {
+  const handleEmojiClick = (emojiObject) => {
     // console.log(event)
     let message = msg;
     // console.log(msg)

@@ -1,32 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Logo from "../assets/Designer.png";
 
-export default function Contacts({ contacts,changeChat }) {
+export default function Contacts({ contacts,changeChat,currentUser }) {
     // console.log("contacts")
-    const [currentUserName, setCurrentUserName] = useState(undefined);
-    const [currentUserImage, setCurrentUserImage] = useState(undefined);
     const [currentSelected, setCurrentSelected] = useState(undefined);
-    useEffect( () => {
-        const gget = async()=>{
-      
-      const data = await JSON.parse(
-        sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)
-      );
-      // console.log(data)
-      if(!data) return;
-      setCurrentUserName(data.username);
-      setCurrentUserImage(data.avatarImage);
-    }
-    gget();
-    }, []);
+
     const changeCurrentChat = (index, contact) => {
       setCurrentSelected(index);
       changeChat(contact);
     };
     return (
       <>
-        {currentUserImage && currentUserName && (
+        {currentUser && (
           <Container>
             <div className="brand">
               <img src={Logo} alt="logo" />
@@ -58,12 +44,12 @@ export default function Contacts({ contacts,changeChat }) {
             <div className="current-user">
               <div className="avatar">
                 <img
-                  src={`data:image/svg+xml;base64,${currentUserImage}`}
+                  src={`data:image/svg+xml;base64,${currentUser.avatarImage}`}
                   alt="avatar"
                 />
               </div>
               <div className="username">
-                <h2>{currentUserName}</h2>
+                <h2>{currentUser.username}</h2>
               </div>
             </div>
           </Container>

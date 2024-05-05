@@ -10,11 +10,12 @@ const register = async(req,res) => {
     if (emailCheck)
       return res.json({ msg: "Email already used", status: false });
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const u = await User.create({
       email,
       username,
       password: hashedPassword,
     });
+    const user = {...u.toObject()};
     delete user.password;
     return res.json({ status: true, user });
 }

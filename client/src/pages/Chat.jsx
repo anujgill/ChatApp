@@ -33,12 +33,13 @@ function Chat() {
     }
   }
     func();
-  }, []);
+  }, [navigate]);
 
 
   useEffect(() => {
     if (currentUser) {
       socket.current = io(HOST);
+      // console.log(socket,socket.current);
       socket.current.emit("add-user", currentUser._id);
     }
   }, [currentUser]);
@@ -48,9 +49,9 @@ function Chat() {
     const fun = async() =>{
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
-        const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+        const {data} = await axios.get(`${allUsersRoute}/${currentUser._id}`);
         // console.log(data)
-        setContacts(data.data);
+        setContacts(data);
         // console.log(contacts)
      } else {
         navigate("/setAvatar");
@@ -60,7 +61,7 @@ function Chat() {
 
   fun();
     
-  }, [currentUser]);
+  }, [currentUser,navigate]);
 
   
 
@@ -72,7 +73,7 @@ function Chat() {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange}/>
+          <Contacts currentUser={currentUser} contacts={contacts} changeChat={handleChatChange}/>
           {currentChat === undefined ? (
             <Welcome/>
           ) : (
