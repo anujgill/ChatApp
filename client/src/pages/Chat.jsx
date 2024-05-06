@@ -16,6 +16,7 @@ function Chat() {
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [onlineUsers,setOnlineUsers] = useState([]);
 
 
   useEffect( () => {
@@ -50,8 +51,8 @@ function Chat() {
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
         const {data} = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-        // console.log(data)
-        setContacts(data);
+        setOnlineUsers(data.onlineUsers)
+        setContacts(data.users);
         // console.log(contacts)
      } else {
         navigate("/setAvatar");
@@ -73,11 +74,11 @@ function Chat() {
     <>
       <Container>
         <div className="container">
-          <Contacts currentUser={currentUser} contacts={contacts} changeChat={handleChatChange}/>
+          <Contacts currentUser={currentUser} onlineUsers={onlineUsers} contacts={contacts} changeChat={handleChatChange}/>
           {currentChat === undefined ? (
             <Welcome/>
           ) : (
-            <ChatContainer currentChat={currentChat} socket={socket}/>
+            <ChatContainer onlineUsers={onlineUsers} currentChat={currentChat} socket={socket}/>
           )}
         </div>
       </Container>

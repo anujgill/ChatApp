@@ -6,7 +6,7 @@ import Logout from "./Logout";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute } from "../utils/Api";
 
-export default function ChatContainer({ currentChat, socket }) {
+export default function ChatContainer({ currentChat, socket,onlineUsers }) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -87,6 +87,9 @@ export default function ChatContainer({ currentChat, socket }) {
           </div>
           <div className="username">
             <h3>{currentChat.username}</h3>
+            {onlineUsers.includes(currentChat._id) && (
+                  <span className="status">online</span>
+            )}
           </div>
         </div>
         <Logout />
@@ -135,11 +138,19 @@ const Container = styled.div`
       .avatar {
         img {
           height: 3rem;
+          margin-top:1.5rem;
         }
       }
       .username {
+        display: flex;
+        flex-direction: column;
         h3 {
           color: white;
+          margin-bottom: 0.1rem;
+        }
+        .status {
+          font-size: 0.8rem;
+          color: green;
         }
       }
     }

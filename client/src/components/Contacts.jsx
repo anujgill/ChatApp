@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import Logo from "../assets/Designer.png";
 
-export default function Contacts({ contacts,changeChat,currentUser }) {
+export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }) {
     // console.log("contacts")
     const [currentSelected, setCurrentSelected] = useState(undefined);
 
@@ -20,6 +20,7 @@ export default function Contacts({ contacts,changeChat,currentUser }) {
             </div>
             <div className="contacts">
               {contacts.map((contact, index) => {
+                const isOnline = onlineUsers.includes(contact._id);
                 return (
                   <div
                     key={contact._id}
@@ -33,6 +34,7 @@ export default function Contacts({ contacts,changeChat,currentUser }) {
                         src={`data:image/svg+xml;base64,${contact.avatarImage}`}
                         alt=""
                       />
+                      {isOnline && <div className="online-dot"></div>}
                     </div>
                     <div className="username">
                       <h3>{contact.username}</h3>
@@ -105,6 +107,15 @@ const Container = styled.div`
       .avatar {
         img {
           height: 3rem;
+        }
+        .online-dot {
+          width: 10px;
+          height: 10px;
+          background-color: green;
+          border-radius: 50%;
+          position:relative;
+          top: 0;
+          right: 0;
         }
       }
       .username {

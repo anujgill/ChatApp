@@ -16,7 +16,7 @@ export default function Login() {
         if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
           navigate("/");
         }
-      }, []);
+      }, [navigate]);
 
     
     const [values,setValues] = useState({

@@ -59,7 +59,12 @@ const getAllUsers = async(req,res) =>{
       "_id",
     ]);
     // console.log(users)
-    return res.json(users);
+    // console.log(onlineUsers)
+    const responseData = {
+      users: users,
+      onlineUsers: Array.from(global.onlineUsers.keys()),
+  };
+    return res.json(responseData);
 }
 
 const logOut = (req, res) => {

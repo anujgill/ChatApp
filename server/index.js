@@ -26,7 +26,8 @@ mongoose.connect(process.env.MONGO_URL).then(()=>{
 const server = app.listen(process.env.PORT, () =>
   console.log(`Server started on ${process.env.PORT}`)
 );
-
+// https://chat-app-six-steel-75.vercel.app
+// http://localhost:3000
 const io = socket(server, {
   cors: {
     origin: "https://chat-app-six-steel-75.vercel.app",

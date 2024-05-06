@@ -17,7 +17,7 @@ export default function Register() {
         if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
           navigate("/");
         }
-      }, []);
+      }, [navigate]);
 
     const [values,setValues] = useState({
         username:"",
@@ -35,6 +35,22 @@ export default function Register() {
 
     const handleValidation = () => {
         const { password, confirmPassword, username, email } = values;
+        // let digit = true;
+        // let specialChar = true;
+        // let cap = true;
+        // for(let i = 0;i<password.length;i++){
+        //   if(password.charAt(i)>='0' && password.charAt(i)<='9')
+        //       digit = false;
+        //   else if(password.charAt(i)==='#' || password.charAt(i)==="@" || password.charAt(i)==="$")
+        //       specialChar = false;
+        //   else if(password.charAt(i)>='A' && password.charAt(i)<='Z')
+        //       cap = false;
+        // }
+        // console.log(digit,specialChar,cap);
+        // if(digit || specialChar || cap){
+        //   toast.error("Password must contain a number,Capital letter and special character.", toastOptions);
+        //   return false;
+        // }
         if (password !== confirmPassword) {
             toast.error(
             "Password and confirm password should be same.",
