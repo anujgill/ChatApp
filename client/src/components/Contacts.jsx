@@ -5,21 +5,39 @@ import Logo from "../assets/Designer.png";
 export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }) {
     // console.log("contacts")
     const [currentSelected, setCurrentSelected] = useState(undefined);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const changeCurrentChat = (index, contact) => {
       setCurrentSelected(index);
       changeChat(contact);
     };
+
+    const filteredContacts = contacts.filter((contact) =>
+      contact.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
       <>
         {currentUser && (
           <Container>
             <div className="brand">
+
+              <div>
               <img src={Logo} alt="logo" />
               <h3>WhispR</h3>
+              </div>
+              <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search Contact"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              </div> 
             </div>
+
             <div className="contacts">
-              {contacts.map((contact, index) => {
+              {filteredContacts.map((contact, index) => {
                 const isOnline = onlineUsers.includes(contact._id);
                 return (
                   <div
@@ -50,10 +68,10 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
                   alt="avatar"
                 />
               </div>
-              <div className="username">
+            <div className="username">
                 <h2>{currentUser.username}</h2>
               </div>
-            </div>
+            </div>  
           </Container>
         )}
       </>
@@ -61,26 +79,54 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
   }
 
 
-const Container = styled.div`
+  const Container = styled.div`
+  border-radius:50px 0px 0px 50px;
   display: grid;
   grid-template-rows: 10% 75% 15%;
   overflow: hidden;
-  background-color: #080420;
+  background-color: #8d9668 ;
   .brand {
+    margin-top:15%;
+    position:relative;
     display: flex;
+    flex-direction:column;
     align-items: center;
-    gap: 1rem;
     justify-content: center;
-    img {
-      height: 2rem;
-    }
-    h3 {
-      color: white;
-      text-transform: uppercase;
+    div{
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+      img {
+        height: 2rem;
+      }
+      h3 {
+        color: white;
+        text-transform: uppercase;
+      }
+  }
+    .search-bar {
+      border-radius:50px;
+      width: 80%;
+      height:50px;
+      padding: 0.5rem;
+      background-color: #1b1b32;
+      input {
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.2rem;
+        outline: none;
+        background-color: #1b1b32;
+        color: white;
+      }
     }
   }
   .contacts {
     display: flex;
+    position: relative;
+    top:15%;
+    bottom:-20px;
     flex-direction: column;
     align-items: center;
     overflow: auto;
@@ -94,7 +140,7 @@ const Container = styled.div`
       }
     }
     .contact {
-      background-color: #ffffff34;
+      background-color: #573132;
       min-height: 5rem;
       cursor: pointer;
       width: 90%;
@@ -130,7 +176,9 @@ const Container = styled.div`
   }
 
   .current-user {
-    background-color: #0d0d30;
+    top:15%;
+    position:relative;
+    background-color: #701316;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -155,4 +203,6 @@ const Container = styled.div`
       }
     }
   }
+
+
 `;

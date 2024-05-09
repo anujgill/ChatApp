@@ -1,4 +1,5 @@
 const Messages = require("../models/messageModel");
+const {encryptMessage,decryptMessage} = require('../service/encrypt');
 
 module.exports.getMessages = async (req, res) => {
     const { from, to } = req.body;
@@ -12,7 +13,7 @@ module.exports.getMessages = async (req, res) => {
     const projectedMessages = messages.map((msg) => {
       return {
         fromSelf: msg.users[0].toString() === from,
-        message: msg.message.text,
+        message: decryptMessage(msg.message.text),
       };
     });
     res.json(projectedMessages);
@@ -20,8 +21,9 @@ module.exports.getMessages = async (req, res) => {
 
 module.exports.addMessage = async (req, res) => {
     const { from, to, message } = req.body;
+    const eMessage = encryptMessage(message);
     const data = await Messages.create({
-      message: { text: message },
+      message: { text: eMessage },
       users: [from, to],
     });
 

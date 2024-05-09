@@ -17,7 +17,7 @@ function Chat() {
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [onlineUsers,setOnlineUsers] = useState([]);
-
+  const [reload,setReload] = useState(true);
 
   useEffect( () => {
     const func = async()=>{
@@ -52,6 +52,7 @@ function Chat() {
       if (currentUser.isAvatarImageSet) {
         const {data} = await axios.get(`${allUsersRoute}/${currentUser._id}`);
         setOnlineUsers(data.onlineUsers)
+        console.log(data.onlineUsers);
         setContacts(data.users);
         // console.log(contacts)
      } else {
@@ -62,9 +63,18 @@ function Chat() {
 
   fun();
     
-  }, [currentUser,navigate]);
+  }, [currentUser,navigate,reload]);
 
+  if (socket.current) {
+    socket.current.on('reload', () => {
+      if(reload===true)
+        setReload(false);
+      else
+        setReload(true);
+    });
+  }
   
+
 
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
@@ -76,7 +86,7 @@ function Chat() {
         <div className="container">
           <Contacts currentUser={currentUser} onlineUsers={onlineUsers} contacts={contacts} changeChat={handleChatChange}/>
           {currentChat === undefined ? (
-            <Welcome/>
+            <Welcome socket={socket}/>
           ) : (
             <ChatContainer onlineUsers={onlineUsers} currentChat={currentChat} socket={socket}/>
           )}
@@ -94,16 +104,17 @@ const Container = styled.div`
   justify-content: center;
   gap: 1rem;
   align-items: center;
-  background-color: #131324;
+  background-color: #4f5731;
   .container {
     height: 85vh;
     width: 85vw;
-    background-color: #00000076;
+    background-color: rgba(0, 0, 0, 0.6);
     display: grid;
     grid-template-columns: 25% 75%;
     @media screen and (min-width: 720px) and (max-width: 1080px) {
       grid-template-columns: 35% 65%;
     }
+    border-radius:50px;
   }
 `;
 

@@ -101,7 +101,8 @@ export default function Login() {
     </>
   )
 }
-  var FormContainer = styled.div`
+
+var FormContainer = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -119,12 +120,15 @@ export default function Login() {
 
     img {
       height: 5rem;
+      border-radius: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     h1 {
-      color: #333;
-      font-size: 2rem;
+      color: #4e0eff;
+      font-size: 2.5rem;
       font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
   }
 
@@ -134,7 +138,7 @@ export default function Login() {
     background-color: #fff;
     border-radius: 1rem;
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 
   input {
@@ -143,7 +147,7 @@ export default function Login() {
     border: 1px solid #ddd;
     border-radius: 0.4rem;
     color: #333;
-    width: calc(100% - 2rem); /* Adjust width to account for padding */
+    width: calc(100% - 2rem); 
     font-size: 1rem;
     margin-bottom: 1rem;
     transition: border-color 0.3s ease;
@@ -166,6 +170,7 @@ export default function Login() {
     text-transform: uppercase;
     transition: background-color 0.3s ease;
     margin-bottom: 1rem;
+    box-shadow: 0 4px 8px rgba(78, 14, 255, 0.2);
 
     &:hover {
       background-color: #3a08b5;
@@ -188,6 +193,8 @@ export default function Login() {
     }
   }
 `;
+
+
 
 
 

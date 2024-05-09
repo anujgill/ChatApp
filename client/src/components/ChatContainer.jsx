@@ -10,7 +10,8 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
-
+  const [unreadMessageCounts,setUnreadMessageCounts] = useState({});
+  // console.log(socket)
   useEffect( () => {
     const func = async () =>{
       const data = await JSON.parse(
@@ -53,8 +54,17 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
     setMessages((prev) => [...prev,{fromSelf:true,message:msg}]);
   };
 
-  socket.current.on("msg-recieve", (msg) => {
-    setArrivalMessage({ fromSelf: false, message: msg });
+  socket.current.on("msg-recieve", (data) => {
+    setArrivalMessage({ fromSelf: false, message: data.msg });
+    console.log(data.from,currentChat._id)
+    if(data.from!==currentChat._id){
+      if(!unreadMessageCounts[data.from]){
+        setUnreadMessageCounts({...unreadMessageCounts,[data.from]: 1,});
+      }else{
+        setUnreadMessageCounts({...unreadMessageCounts,[data.from]: [data.from]+1,});
+      }
+    }
+    console.log(unreadMessageCounts);
   });
 
   // useEffect(() => {
@@ -92,7 +102,7 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
             )}
           </div>
         </div>
-        <Logout />
+        <Logout socket={socket}/>
       </div>
       <div className="chat-messages">
         {messages.map((message,index) => {

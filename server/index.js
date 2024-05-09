@@ -41,12 +41,24 @@ io.on("connection", (socket) => {
   // console.log(socket.handshake.address)
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
+    socket.broadcast.emit("reload");
   });
 
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+      socket.to(sendUserSocket).emit("msg-recieve",{from: data.from,msg:data.msg});
+    }
+  });
+
+  socket.on("disconnect", () => {
+    const disconnectedUserId = Array.from(onlineUsers.entries()).find(
+      ([userId, socketId]) => socketId === socket.id
+    );
+    socket.broadcast.emit("reload");
+    if (disconnectedUserId) {
+      onlineUsers.delete(disconnectedUserId[0]);
     }
   });
 });
+

@@ -4,7 +4,8 @@ import { BiPowerOff } from "react-icons/bi";
 import styled from "styled-components";
 import axios from "axios";
 import { logoutRoute } from "../utils/Api";
-export default function Logout() {
+export default function Logout({socket}) {
+  // console.log(socket)
   const navigate = useNavigate();
   const handleClick = async () => {
     const id = await JSON.parse(
@@ -13,6 +14,7 @@ export default function Logout() {
     const data = await axios.get(`${logoutRoute}/${id}`);
     if (data.status === 200) {
       sessionStorage.clear();
+      socket.current.disconnect();
       navigate("/login");
     }
   };

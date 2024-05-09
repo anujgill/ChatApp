@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import GIF from "../assets/giphy.gif";
 import Logout from "./Logout";
-export default function Welcome() {
+export default function Welcome({socket}) {
   const [userName, setUserName] = useState("");
   useEffect( () => {
     const f = async ()=>{
@@ -16,7 +16,7 @@ export default function Welcome() {
   }, []);
   return (
     <Container>
-      <Logout/>
+      <Logout socket={socket}/>
       <img src={GIF} alt="" />
       <h1>
         Welcome, <span>{userName}!</span>
