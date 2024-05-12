@@ -6,26 +6,43 @@ import Logout from "./Logout";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute } from "../utils/Api";
 
-export default function ChatContainer({ currentChat, socket,onlineUsers }) {
+export default function ChatContainer({currentUser, currentChat, socket,onlineUsers }) {
   // console.log(currentChat)
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
-  const currUser = useRef();
+  const currChat = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [isTyping,setIsTyping] = useState(false);
+  const [typeStatus,setTypeStatus] = useState(false);
   // console.log(socket)
   useEffect( () => {
     const func = async () =>{
-      const data = await JSON.parse(
-        sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)
-      );
       const response = await axios.post(recieveMessageRoute, {
-        from: data._id,
+        from: currentUser._id,
         to: currentChat._id,
       });
       setMessages(response.data);
   }
     func();
   }, [currentChat]);
+
+
+  //typing
+  useEffect(()=>{
+      socket.current.emit("setType",{
+        isTyping:isTyping,
+        from:currentUser._id,
+        to:currentChat._id
+      });
+  },[isTyping]);
+
+  const handleTypeState = (state)=>{
+    setIsTyping(state);
+  }
+
+
+
+
 
   // useEffect(() => {
   //   const getCurrentChat = async () => {
@@ -39,42 +56,43 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
   // }, [currentChat]);
 
   const handleSendMsg = async (msg) => {
-    const data = await JSON.parse(
-      sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)
-    );
     socket.current.emit("send-msg", {
       to: currentChat._id,
-      from: data._id,
+      from: currentUser._id,
       msg,
     });
     await axios.post(sendMessageRoute, {
-      from: data._id,
+      from: currentUser._id,
       to: currentChat._id,
       message: msg,
     });
     setMessages((prev) => [...prev,{fromSelf:true,message:msg}]);
   };
 
-  // socket.current.on("msg-recieve", (data) => {
-    
-  //   console.log(data.from===currentChat._id)
-  //   if(data.from===currentChat._id){
-  //     console.log("currentChat")
-  //     // setArrivalMessage({ fromSelf: false, message: data.msg });
-  //   }
-  // });
 
   useEffect(() => {
     if (socket.current) {
-      currUser.current = currentChat;
+      currChat.current = currentChat;
       socket.current.on("msg-recieve", (data) => {
-        if(data.from!==currUser.current._id){
+        if(data.from!==currChat.current._id){
           return;
         }
           setArrivalMessage({ fromSelf: false, message: data.msg });
       });
     }
   }, [currentChat,socket]);
+
+  useEffect(() => {
+    if (socket.current) {
+      currChat.current = currentChat;
+      socket.current.on("typeStatus", (data) => {
+        if(data.from!==currChat.current._id){
+          return;
+        }
+          setTypeStatus(data.typeStatus);
+      });
+    }
+  }, [currentChat]);
 
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
@@ -99,7 +117,7 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
           <div className="username">
             <h3>{currentChat.username}</h3>
             {onlineUsers.includes(currentChat._id) && (
-                  <span className="status">online</span>
+                  <span className="status">{typeStatus?"typing...":"online"}</span>
             )}
           </div>
         </div>
@@ -122,7 +140,7 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
           );
         })}
       </div>
-      <ChatInput handleSendMsg={handleSendMsg} />
+      <ChatInput handleSendMsg={handleSendMsg} handleTypeState={handleTypeState}/>
     </Container>
     )}
     </>

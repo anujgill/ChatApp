@@ -113,7 +113,7 @@ function Chat() {
           {currentChat === undefined ? (
             <Welcome socket={socket}/>
           ) : (
-            <ChatContainer onlineUsers={onlineUsers} currentChat={currentChat} socket={socket}/>
+            <ChatContainer currentUser={currentUser} onlineUsers={onlineUsers} currentChat={currentChat} socket={socket}/>
           )}
         </div>
       </Container>

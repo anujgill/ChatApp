@@ -51,6 +51,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("setType", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("typeStatus",{from: data.from,typeStatus:data.isTyping});
+    }
+  });
+
   socket.on("disconnect", () => {
     const disconnectedUserId = Array.from(onlineUsers.entries()).find(
       ([userId, socketId]) => socketId === socket.id

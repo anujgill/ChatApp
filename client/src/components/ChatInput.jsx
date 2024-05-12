@@ -1,14 +1,23 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 import styled from "styled-components";
 import Picker from "emoji-picker-react";
 
-export default function ChatInput({ handleSendMsg }) {
+export default function ChatInput({ handleSendMsg,handleTypeState }) {
   const [msg, setMsg] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const typingTimeoutRef = useRef(null);
   const handleEmojiPickerhideShow = () => {
     setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  const handleTyping = (e) => {
+    setMsg(e.target.value);
+    handleTypeState(true);
+    typingTimeoutRef.current = setTimeout(() => {
+      handleTypeState(false);
+    }, 1000);
   };
 
   const handleEmojiClick = (emojiObject) => {
@@ -39,7 +48,7 @@ export default function ChatInput({ handleSendMsg }) {
         <input
           type="text"
           placeholder="type your message here"
-          onChange={(e) => setMsg(e.target.value)}
+          onChange={(e) => handleTyping(e)}
           value={msg}
         />
         <button type="submit">
@@ -51,6 +60,7 @@ export default function ChatInput({ handleSendMsg }) {
 }
 
 const Container = styled.div`
+  border-radius: 0 0 50px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
