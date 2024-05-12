@@ -6,8 +6,9 @@ Whispr is a chat application designed to facilitate real-time communication betw
 
 - **Real-time Messaging:** Send and receive messages instantly without refreshing the page.
 - **User Authentication:** Secure login and registration system to protect user data.
-- **Contacts List:** View and select contacts to start conversations.
+- **Contacts List:** View,search and select contacts to start conversations.
 - **Online Status:** See who's online with real-time status indicators.
+- **Message Encryption:** Messages are encrypted using AES (Advanced Encryption Standard).
 
 ## Technologies Used
 
