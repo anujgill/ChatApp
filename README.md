@@ -9,7 +9,7 @@ Whispr is a chat application designed to facilitate real-time communication betw
 - **Contacts List:** View,search and select contacts to start conversations.
 - **Online Status:** See who's online with real-time status indicators.
 - **Message Encryption:** Messages are encrypted using AES (Advanced Encryption Standard).
-
+- **Unread Messages:** Provides a clear count of unread messages for convenient tracking.
 ## Technologies Used
 
 - **Frontend:** React, styled-components, Axios
