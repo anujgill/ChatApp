@@ -12,12 +12,14 @@ function Chat() {
   // console.log("chat")
   const navigate = useNavigate();
   const socket = useRef();
+  const currChat = useRef();
   // console.log(socket)
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [onlineUsers,setOnlineUsers] = useState([]);
   const [reload,setReload] = useState(true);
+
 
   useEffect( () => {
     const func = async()=>{
@@ -52,8 +54,9 @@ function Chat() {
       if (currentUser.isAvatarImageSet) {
         const {data} = await axios.get(`${allUsersRoute}/${currentUser._id}`);
         setOnlineUsers(data.onlineUsers)
+        const updatedContacts = data.users.map(user => ({ ...user, unreadCount: 0 }));
+        setContacts(updatedContacts);
         console.log(data.onlineUsers);
-        setContacts(data.users);
         // console.log(contacts)
      } else {
         navigate("/setAvatar");
@@ -73,12 +76,34 @@ function Chat() {
         setReload(true);
     });
   }
-  
-
+  useEffect(()=>{
+    if (socket.current) {
+      currChat.current = currentChat;
+      socket.current.on("msg-recieve", (data) => {
+        if(data.from!==currChat.current?._id){
+          // console.log(data.from,currentChat);
+          const updatedContacts = contacts.map(contact =>
+            contact._id === data.from ? { ...contact, unreadCount: contact.unreadCount + 1 } : contact
+          );
+          
+          setContacts(updatedContacts);
+        }
+      });
+    }
+  },[currentChat,contacts]);
 
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
   };
+  
+  useEffect(() => {
+    // console.log(currentChat)
+    const updatedContacts = contacts.map(contact =>
+      contact._id === currChat.current._id ? { ...contact, unreadCount: 0 } : contact
+    );
+    setContacts(updatedContacts);
+  }, [currentChat]);
+  
 
   return (
     <>

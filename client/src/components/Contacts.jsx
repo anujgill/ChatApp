@@ -57,6 +57,7 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
                     <div className="username">
                       <h3>{contact.username}</h3>
                     </div>
+                    <h2 className="unreads">{contact.unreadCount}</h2>
                   </div>
                 );
               })}
@@ -126,6 +127,7 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
     display: flex;
     position: relative;
     top:15%;
+    height:90%;
     bottom:-20px;
     flex-direction: column;
     align-items: center;
@@ -150,6 +152,7 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
       gap: 1rem;
       align-items: center;
       transition: 0.5s ease-in-out;
+      justify-content: space-between;
       .avatar {
         img {
           height: 3rem;
@@ -168,6 +171,13 @@ export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }
         h3 {
           color: white;
         }
+      }
+      .unreads{
+        color:green;
+        font-weight: bold;
+        margin-left: auto;
+        margin-right:10%;
+        
       }
     }
     .selected {

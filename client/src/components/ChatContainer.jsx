@@ -7,10 +7,11 @@ import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute } from "../utils/Api";
 
 export default function ChatContainer({ currentChat, socket,onlineUsers }) {
+  // console.log(currentChat)
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
+  const currUser = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [unreadMessageCounts,setUnreadMessageCounts] = useState({});
   // console.log(socket)
   useEffect( () => {
     const func = async () =>{
@@ -54,26 +55,26 @@ export default function ChatContainer({ currentChat, socket,onlineUsers }) {
     setMessages((prev) => [...prev,{fromSelf:true,message:msg}]);
   };
 
-  socket.current.on("msg-recieve", (data) => {
-    setArrivalMessage({ fromSelf: false, message: data.msg });
-    console.log(data.from,currentChat._id)
-    if(data.from!==currentChat._id){
-      if(!unreadMessageCounts[data.from]){
-        setUnreadMessageCounts({...unreadMessageCounts,[data.from]: 1,});
-      }else{
-        setUnreadMessageCounts({...unreadMessageCounts,[data.from]: [data.from]+1,});
-      }
-    }
-    console.log(unreadMessageCounts);
-  });
-
-  // useEffect(() => {
-  //   if (socket.current) {
-  //     socket.current.on("msg-recieve", (msg) => {
-  //       setArrivalMessage({ fromSelf: false, message: msg });
-  //     });
+  // socket.current.on("msg-recieve", (data) => {
+    
+  //   console.log(data.from===currentChat._id)
+  //   if(data.from===currentChat._id){
+  //     console.log("currentChat")
+  //     // setArrivalMessage({ fromSelf: false, message: data.msg });
   //   }
-  // }, []);
+  // });
+
+  useEffect(() => {
+    if (socket.current) {
+      currUser.current = currentChat;
+      socket.current.on("msg-recieve", (data) => {
+        if(data.from!==currUser.current._id){
+          return;
+        }
+          setArrivalMessage({ fromSelf: false, message: data.msg });
+      });
+    }
+  }, [currentChat,socket]);
 
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
