@@ -8,11 +8,7 @@ const socket = require("socket.io");
 const app = express();
 require('dotenv').config();
 
-const corsOptions = {
-  origin: ["https://chatapp-r4us.onrender.com","https://chat-app-six-steel-75.vercel.app"],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.get('/',(req,res)=>{
   res.end("Hello World");
@@ -32,7 +28,12 @@ const server = app.listen(process.env.PORT, () =>
 );
 // https://chat-app-six-steel-75.vercel.app
 // http://localhost:3000
-const io = socket(server);
+const io = socket(server, {
+  cors: {
+    origin: "https://chat-app-six-steel-75.vercel.app",
+    credentials: true,
+  },
+});
 
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
