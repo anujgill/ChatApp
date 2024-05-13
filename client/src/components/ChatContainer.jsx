@@ -19,7 +19,8 @@ export default function ChatContainer({currentUser, currentChat, socket,onlineUs
     const func = async () =>{
       let request=axios.create({
         headers:{
-          "Content-Type":"application/json"
+          "Content-Type":"application/json",
+          "Access-Control-Allow-Origin":"*"
         }
       }
 
