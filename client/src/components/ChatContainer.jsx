@@ -69,7 +69,7 @@ export default function ChatContainer({currentUser, currentChat, socket,onlineUs
       from: currentUser._id,
       msg,
     });
-    await axios.post(sendMessageRoute, {
+    await request.post(sendMessageRoute, {
       from: currentUser._id,
       to: currentChat._id,
       message: msg,
