@@ -9,7 +9,7 @@ const app = express();
 require('dotenv').config();
 
 const corsOptions = {
-  origin: "https://chat-app-six-steel-75.vercel.app",
+  origin: ["https://chatapp-r4us.onrender.com","https://chat-app-six-steel-75.vercel.app"],
   credentials: true,
 };
 app.use(cors(corsOptions));
