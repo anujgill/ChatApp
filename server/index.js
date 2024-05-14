@@ -13,18 +13,18 @@ require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
-app.get('/',(req,res)=>{
-  res.end("Hello World");
-});
+// app.get('/',(req,res)=>{
+//   res.end("Hello World");
+// });
 app.use("/api/auth",userRoutes)
 app.use('/api/messages',messageRoutes);
 
 //deployment
 // const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname,"client","build")));
-// app.get("*", (req, res) => {
-// 	res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-// });
+app.get("*", (req, res) => {
+	res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
 
 mongoose.connect(process.env.MONGO_URL).then(()=>{
     console.log("Connected to database")
@@ -37,9 +37,10 @@ const server = app.listen(process.env.PORT, () =>
 );
 // https://chat-app-six-steel-75.vercel.app
 // http://localhost:3000
+// https://chatapp-1-4s7l.onrender.com
 const io = socket(server, {
   cors: {
-    origin: "https://chat-app-six-steel-75.vercel.app",
+    origin: "https://chatapp-1-4s7l.onrender.com",
     credentials: true,
   },
 });
