@@ -4,9 +4,12 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoute')
 const messageRoutes = require('./routes/messageRoutes');
 const socket = require("socket.io");
+const path = require('path');
 
 const app = express();
 require('dotenv').config();
+
+
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +19,12 @@ app.get('/',(req,res)=>{
 app.use("/api/auth",userRoutes)
 app.use('/api/messages',messageRoutes);
 
+//deployment
+// const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname,"client","build")));
+// app.get("*", (req, res) => {
+// 	res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+// });
 
 mongoose.connect(process.env.MONGO_URL).then(()=>{
     console.log("Connected to database")

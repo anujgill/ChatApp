@@ -17,15 +17,7 @@ export default function ChatContainer({currentUser, currentChat, socket,onlineUs
   // console.log(socket)
   useEffect( () => {
     const func = async () =>{
-      let request=axios.create({
-        headers:{
-          "Content-Type":"application/json",
-          "Access-Control-Allow-Origin":"*"
-        }
-      }
-
-      )
-      const response = await request.post(recieveMessageRoute, {
+      const response = await axios.post(recieveMessageRoute, {
         from: currentUser._id,
         to: currentChat._id,
       });
@@ -69,7 +61,7 @@ export default function ChatContainer({currentUser, currentChat, socket,onlineUs
       from: currentUser._id,
       msg,
     });
-    await request.post(sendMessageRoute, {
+    await axios.post(sendMessageRoute, {
       from: currentUser._id,
       to: currentChat._id,
       message: msg,
