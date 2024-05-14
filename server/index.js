@@ -21,9 +21,11 @@ app.use('/api/messages',messageRoutes);
 
 //deployment
 // const __dirname = path.resolve();
+console.log(__dirname);
+// console.log("first")
 app.use(express.static(path.join(__dirname,"client","build")));
 app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "client", "public", "index.html"));
+	res.sendFile(path.resolve(__dirname,"..", "client", "public", "index.html"));
 });
 
 mongoose.connect(process.env.MONGO_URL).then(()=>{
