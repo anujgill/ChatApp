@@ -45,8 +45,7 @@ export default function ChatInput({ handleSendMsg,handleTypeState }) {
         </div>
       </div>
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
-        <input
-          type="text"
+        <textarea
           placeholder="type your message here"
           onChange={(e) => handleTyping(e)}
           value={msg}
@@ -115,16 +114,19 @@ const Container = styled.div`
     gap: 1rem;
     background-color: #ffffff34;
 
-    input {
-      flex-grow: 1;
-      height: 100%;
-      background-color: transparent;
-      color: white;
+    textarea {
+      flex: 1;
+      background: transparent;
       border: none;
-      padding: 0.5rem;
+      color: white;
       font-size: 1.2rem;
-      &::selection {
-        background-color: #9a86f3;
+      padding-left: 0.5rem;
+      resize: none;
+      overflow: hidden;
+      height: 1.5rem;
+      line-height: 1.5rem;
+      &::placeholder {
+        color: #aaa;
       }
       &:focus {
         outline: none;

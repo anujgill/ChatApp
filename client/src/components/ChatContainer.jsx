@@ -211,6 +211,9 @@ const Container = styled.div`
         @media screen and (min-width: 720px) and (max-width: 1080px) {
           max-width: 70%;
         }
+        p{
+          white-space: pre-wrap;
+        }
       }
     }
     .sended {

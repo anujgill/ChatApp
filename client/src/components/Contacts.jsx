@@ -3,7 +3,6 @@ import styled from "styled-components";
 import Logo from "../assets/Designer.png";
 
 export default function Contacts({ contacts,changeChat,currentUser,onlineUsers }) {
-    // console.log("contacts")
     const [currentSelected, setCurrentSelected] = useState(undefined);
     const [searchQuery, setSearchQuery] = useState("");
 
