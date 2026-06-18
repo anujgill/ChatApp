@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoute')
 const messageRoutes = require('./routes/messageRoutes');
 const socket = require("socket.io");
+const User = require('./models/userModel');
 
 const app = express();
 require('dotenv').config();
@@ -19,8 +20,19 @@ app.use("/api/auth",userRoutes)
 app.use('/api/messages',messageRoutes);
 
 
-mongoose.connect(process.env.MONGO_URL).then(()=>{
-    console.log("Connected to database")
+mongoose.connect(process.env.MONGO_URL).then(async ()=>{
+    console.log("Connected to database");
+    try {
+        const result = await User.updateMany(
+            { isVerified: { $exists: false } },
+            { $set: { isVerified: true } }
+        );
+        if (result.modifiedCount > 0) {
+            console.log(`Migrated ${result.modifiedCount} legacy users to isVerified: true`);
+        }
+    } catch (err) {
+        console.error("Migration error:", err);
+    }
 }).catch((err)=>{
     console.log(err)
 });
@@ -32,7 +44,7 @@ const server = app.listen(process.env.PORT, () =>
 // http://localhost:3000
 const io = socket(server, {
   cors: {
-    origin: "https://chat-app-six-steel-75.vercel.app",
+    origin: ["http://localhost:3000","https://chat-app-six-steel-75.vercel.app"],
     credentials: true,
   },
 });
@@ -57,6 +69,20 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("typeStatus",{from: data.from,typeStatus:data.isTyping});
+    }
+  });
+
+  socket.on("send-request", (data) => {
+    const receiverSocket = onlineUsers.get(data.to);
+    if (receiverSocket) {
+      socket.to(receiverSocket).emit("new-request", data);
+    }
+  });
+
+  socket.on("request-response", (data) => {
+    const senderSocket = onlineUsers.get(data.to);
+    if (senderSocket) {
+      socket.to(senderSocket).emit("request-status-updated", data);
     }
   });
 

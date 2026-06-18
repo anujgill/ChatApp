@@ -32,10 +32,36 @@ const Container = styled.div`
   align-items: center;
   color: white;
   flex-direction: column;
+  background-color: rgba(12, 12, 22, 0.25);
+  position: relative;
+  height: 100%;
+
   img {
-    height: 20rem;
+    height: 15rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
-  span {
-    color: #4e0eff;
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    span {
+      background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+  }
+
+  h3 {
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 0.5px;
   }
 `;

@@ -4,27 +4,18 @@ import Logo from "../assets/Designer.png";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { registerRoute, verifyRegisterRoute } from "../utils/Api";
+import { sendOtpRoute, verifyOtpRoute, resetPasswordOtpRoute } from "../utils/Api";
 import axios from "axios";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-export default function Register() {
+export default function ForgotPassword() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
-      navigate("/");
-    }
-  }, [navigate]);
-
   const [step, setStep] = useState(1);
-  const [values, setValues] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
+  const [maskedEmail, setMaskedEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -36,80 +27,76 @@ export default function Register() {
     theme: "dark",
   };
 
-  const handleValidation = () => {
-    const { password, confirmPassword, username, email } = values;
-
-    if (password !== confirmPassword) {
-      toast.error("Password and confirm password should be same.", toastOptions);
-      return false;
-    } else if (username.length < 3 || username.length > 20) {
-      toast.error("Username should be between 3 and 20 characters.", toastOptions);
-      return false;
-    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      toast.error("Username can only contain alphanumeric characters and underscores.", toastOptions);
-      return false;
-    } else if (password.length < 8) {
-      toast.error("Password should be equal or greater than 8 characters.", toastOptions);
-      return false;
-    } else if (email === "") {
-      toast.error("Email is required.", toastOptions);
-      return false;
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (username === "") {
+      toast.error("Username or Email is required.", toastOptions);
+      return;
     }
-    return true;
-  };
-
-  const handleSubmitStep1 = async (event) => {
-    event.preventDefault();
-    if (handleValidation()) {
-      const { email, username, password } = values;
-      try {
-        toast.info("Sending verification code...", { ...toastOptions, autoClose: 2000 });
-        const { data } = await axios.post(registerRoute, {
-          username,
-          email,
-          password,
-        });
-        if (data.status === false) {
-          toast.error(data.msg, toastOptions);
-        } else {
-          toast.success(data.msg, toastOptions);
-          setStep(2);
-        }
-      } catch (error) {
-        toast.error("Registration failed. Please try again.", toastOptions);
+    try {
+      toast.info("Sending OTP... Please wait.", { ...toastOptions, autoClose: 2000 });
+      const { data } = await axios.post(sendOtpRoute, { username });
+      if (data.status === true) {
+        setMaskedEmail(data.email);
+        toast.success(data.msg, toastOptions);
+        setStep(2);
+      } else {
+        toast.error(data.msg, toastOptions);
       }
+    } catch (error) {
+      toast.error("Failed to send OTP. Please check your credentials.", toastOptions);
     }
   };
 
-  const handleVerifyOTP = async (event) => {
-    event.preventDefault();
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
     if (otp.trim().length !== 6) {
       toast.error("Please enter a valid 6-digit OTP code.", toastOptions);
       return;
     }
     try {
-      const { data } = await axios.post(verifyRegisterRoute, {
-        username: values.username,
-        otp,
-      });
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
+      const { data } = await axios.post(verifyOtpRoute, { username, otp });
+      if (data.status === true) {
+        toast.success(data.msg, toastOptions);
+        setStep(3);
       } else {
-        toast.success("Email verified successfully! Profile created.", toastOptions);
-        sessionStorage.setItem(
-          process.env.REACT_APP_CURRENT_USER,
-          JSON.stringify(data.user)
-        );
-        navigate(`/setAvatar`);
+        toast.error(data.msg, toastOptions);
       }
     } catch (error) {
       toast.error("Verification failed. Please try again.", toastOptions);
     }
   };
 
-  function handleChange(event) {
-    setValues({ ...values, [event.target.name]: event.target.value });
-  }
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 8) {
+      toast.error("Password should be equal or greater than 8 characters.", toastOptions);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.", toastOptions);
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(resetPasswordOtpRoute, {
+        username,
+        otp,
+        newPassword,
+      });
+
+      if (data.status === true) {
+        toast.success("Password reset successful! Redirecting to login...", toastOptions);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        toast.error(data.msg, toastOptions);
+      }
+    } catch (error) {
+      toast.error("Failed to reset password. Please try again.", toastOptions);
+    }
+  };
 
   return (
     <>
@@ -118,70 +105,38 @@ export default function Register() {
         <div className="glow-orb glow-orb-2"></div>
 
         {step === 1 && (
-          <form onSubmit={(event) => handleSubmitStep1(event)}>
+          <form onSubmit={handleSendOtp}>
             <div className="brand">
               <img src={Logo} alt="logo" />
               <h1>WhispR</h1>
             </div>
-            <h2>Create Account</h2>
-            <p className="subtitle">Sign up to start messaging securely</p>
+            <h2>Reset Password</h2>
+            <p className="instruction">
+              Enter your username or email to receive a password recovery verification code.
+            </p>
             <input
               type="text"
-              placeholder="Username"
-              name="username"
-              maxLength="20"
-              value={values.username}
-              onChange={(e) => handleChange(e)}
+              placeholder="Username or Email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-            <input
-              type="email"
-              placeholder="Email Address"
-              name="email"
-              value={values.email}
-              onChange={(e) => handleChange(e)}
-            />
-            <div className="password-input-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                name="password"
-                value={values.password}
-                onChange={(e) => handleChange(e)}
-              />
-              <div className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </div>
-            </div>
-            <div className="password-input-wrapper">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                name="confirmPassword"
-                value={values.confirmPassword}
-                onChange={(e) => handleChange(e)}
-              />
-              <div className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </div>
-            </div>
-
             <button type="submit">Send Code</button>
-            <span>
-              Already have an account? <Link to="/login">Login</Link>
-            </span>
+            <div className="back-link">
+              <Link to="/login">Back to Login</Link>
+            </div>
           </form>
         )}
 
         {step === 2 && (
-          <form onSubmit={(event) => handleVerifyOTP(event)}>
+          <form onSubmit={handleVerifyOtp}>
             <div className="brand">
               <img src={Logo} alt="logo" />
               <h1>WhispR</h1>
             </div>
-            <h2>Verify Email</h2>
+            <h2>Enter Code</h2>
             <p className="instruction">
-              We have sent a 6-digit OTP code to: <br />
-              <strong>{values.email}</strong>.
+              We have sent a 6-digit OTP code to your registered email: <br />
+              <strong>{maskedEmail}</strong>.
             </p>
             <input
               type="text"
@@ -191,9 +146,51 @@ export default function Register() {
               onChange={(e) => setOtp(e.target.value)}
               className="otp-input"
             />
-            <button type="submit">Verify & Register</button>
+            <button type="submit">Verify Code</button>
             <div className="back-link">
               <button className="text-btn" type="button" onClick={() => setStep(1)}>
+                Back
+              </button>
+            </div>
+          </form>
+        )}
+
+        {step === 3 && (
+          <form onSubmit={handleResetPassword}>
+            <div className="brand">
+              <img src={Logo} alt="logo" />
+              <h1>WhispR</h1>
+            </div>
+            <h2>New Password</h2>
+            <p className="instruction">Set a new secure password for your account.</p>
+            
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <div className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </div>
+            </div>
+
+            <div className="password-input-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <div className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </div>
+            </div>
+
+            <button type="submit">Reset Password</button>
+            <div className="back-link">
+              <button className="text-btn" type="button" onClick={() => setStep(2)}>
                 Back
               </button>
             </div>
@@ -265,7 +262,7 @@ const FormContainer = styled.div`
 
   form {
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
     background-color: rgba(12, 12, 22, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -290,18 +287,11 @@ const FormContainer = styled.div`
       -webkit-text-fill-color: transparent;
     }
 
-    p.subtitle {
-      color: #94a3b8;
-      text-align: center;
-      font-size: 0.9rem;
-      margin: 0 0 1.8rem 0;
-    }
-
     p.instruction {
       color: #94a3b8;
       text-align: center;
       font-size: 0.9rem;
-      margin: 0 0 1.5rem 0;
+      margin: 0 0 1.6rem 0;
       line-height: 1.5;
 
       strong {
@@ -398,29 +388,23 @@ const FormContainer = styled.div`
     }
   }
 
-  span {
-    color: #64748b;
-    font-size: 0.85rem;
+  .back-link {
     text-align: center;
-    letter-spacing: 0.3px;
-
+    margin-top: 0.5rem;
+    
     a {
       color: #818cf8;
       text-decoration: none;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: bold;
       transition: color 0.2s ease;
-
+      
       &:hover {
         color: #a5b4fc;
         text-decoration: underline;
       }
     }
-  }
 
-  .back-link {
-    text-align: center;
-    margin-top: 0.5rem;
-    
     .text-btn {
       background: none;
       border: none;

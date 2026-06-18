@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import SetAvatar from './components/SetAvatar';
+import ForgotPassword from './pages/ForgotPassword';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
         <Routes>
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
+          <Route path="/forgot-password" element={<ForgotPassword/>}></Route>
           <Route path="/" element={<Chat/>}></Route>
           <Route path="/setAvatar" element={<SetAvatar/>}></Route>
         </Routes>

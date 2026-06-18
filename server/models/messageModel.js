@@ -6,6 +6,10 @@ const MessageSchema = new mongoose.Schema(
       text: { type: String, required: true },
     },
     users: Array,
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

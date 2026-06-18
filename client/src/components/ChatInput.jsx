@@ -1,53 +1,99 @@
-import React, { useState,useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 import styled from "styled-components";
-import Picker from "emoji-picker-react";
+import Picker, { Theme } from "emoji-picker-react";
 
-export default function ChatInput({ handleSendMsg,handleTypeState }) {
+export default function ChatInput({ handleSendMsg, handleTypeState }) {
   const [msg, setMsg] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const typingTimeoutRef = useRef(null);
+  const textareaRef = useRef(null);
+  const emojiRef = useRef(null);
+
   const handleEmojiPickerhideShow = () => {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleTyping = (e) => {
-    setMsg(e.target.value);
+    const val = e.target.value;
+    setMsg(val);
     handleTypeState(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
     typingTimeoutRef.current = setTimeout(() => {
       handleTypeState(false);
     }, 1000);
+
+    // Auto resize
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
   };
 
   const handleEmojiClick = (emojiObject) => {
-    // console.log(event)
     let message = msg;
-    // console.log(msg)
     message += emojiObject.emoji;
     setMsg(message);
+    // After adding emoji, update height of textarea if needed
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        textareaRef.current.focus();
+      }
+    }, 0);
   };
 
   const sendChat = (event) => {
-    event.preventDefault();
-    if (msg.length > 0) {
+    if (event) event.preventDefault();
+    if (msg.trim().length > 0) {
       handleSendMsg(msg);
       setMsg("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "1.5rem";
+      }
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
     }
   };
 
   return (
     <Container>
       <div className="button-container">
-        <div className="emoji">
+        <div className="emoji" ref={emojiRef}>
           <BsEmojiSmileFill onClick={handleEmojiPickerhideShow} />
-          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick} />}
+          {showEmojiPicker && (
+            <Picker onEmojiClick={handleEmojiClick} theme={Theme.DARK} />
+          )}
         </div>
       </div>
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
         <textarea
+          ref={textareaRef}
           placeholder="type your message here"
           onChange={(e) => handleTyping(e)}
+          onKeyDown={handleKeyDown}
           value={msg}
         />
         <button type="submit">
@@ -77,31 +123,12 @@ const Container = styled.div`
       color: #ffff00c8;
       cursor: pointer;
     }
-    .emoji-picker-react {
-      position: absolute;
-      top: -350px;
-      background-color: #080420;
+    .EmojiPickerReact {
+      position: absolute !important;
+      bottom: 60px;
+      left: 0;
       box-shadow: 0 5px 10px #9a86f3;
       border-color: #9a86f3;
-      .emoji-scroll-wrapper::-webkit-scrollbar {
-        background-color: #080420;
-        width: 5px;
-        &-thumb {
-          background-color: #9a86f3;
-        }
-      }
-      .emoji-categories {
-        button {
-          filter: contrast(0);
-        }
-      }
-      .emoji-search {
-        background-color: transparent;
-        border-color: #9a86f3;
-      }
-      .emoji-group:before {
-        background-color: #080420;
-      }
     }
   }
 
@@ -122,14 +149,23 @@ const Container = styled.div`
       font-size: 1.2rem;
       padding-left: 0.5rem;
       resize: none;
-      overflow: hidden;
+      min-height: 1.5rem;
+      max-height: 120px;
       height: 1.5rem;
       line-height: 1.5rem;
+      overflow-y: auto;
       &::placeholder {
         color: #aaa;
       }
       &:focus {
         outline: none;
+      }
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #9a86f3;
+        border-radius: 10px;
       }
     }
 

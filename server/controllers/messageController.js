@@ -1,8 +1,30 @@
 const Messages = require("../models/messageModel");
 const {encryptMessage,decryptMessage} = require('../service/encrypt');
+const mongoose = require("mongoose");
 
-module.exports.getMessages = async (req, res) => {
+module.exports.getMessages = async (req, res, next) => {
+  try {
     const { from, to } = req.body;
+
+    // Mark messages from 'to' (contact) to 'from' (current user) as read
+    await Messages.updateMany(
+      {
+        $or: [
+          {
+            "users.0": to.toString(),
+            "users.1": from.toString(),
+          },
+          {
+            "users.0": new mongoose.Types.ObjectId(to),
+            "users.1": new mongoose.Types.ObjectId(from),
+          },
+        ],
+        isRead: { $ne: true },
+      },
+      {
+        $set: { isRead: true },
+      }
+    );
 
     const messages = await Messages.find({
       users: {
@@ -12,14 +34,48 @@ module.exports.getMessages = async (req, res) => {
 
     const projectedMessages = messages.map((msg) => {
       return {
+        _id: msg._id,
         fromSelf: msg.users[0].toString() === from,
         message: decryptMessage(msg.message.text),
       };
     });
-    res.json(projectedMessages);
+    return res.json(projectedMessages);
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: false, msg: "Internal Server Error" });
+  }
 };
 
-module.exports.addMessage = async (req, res) => {
+module.exports.markAsRead = async (req, res, next) => {
+  try {
+    const { from, to } = req.body;
+    await Messages.updateMany(
+      {
+        $or: [
+          {
+            "users.0": from.toString(),
+            "users.1": to.toString(),
+          },
+          {
+            "users.0": new mongoose.Types.ObjectId(from),
+            "users.1": new mongoose.Types.ObjectId(to),
+          },
+        ],
+        isRead: { $ne: true },
+      },
+      {
+        $set: { isRead: true },
+      }
+    );
+    return res.json({ status: true });
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: false, msg: "Internal Server Error" });
+  }
+};
+
+module.exports.addMessage = async (req, res, next) => {
+  try {
     const { from, to, message } = req.body;
     const eMessage = encryptMessage(message);
     const data = await Messages.create({
@@ -29,4 +85,8 @@ module.exports.addMessage = async (req, res) => {
 
     if (data) return res.json({ msg: "Message added successfully." });
     else return res.json({ msg: "Failed to add message to the database" });
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: false, msg: "Internal Server Error" });
+  }
 };

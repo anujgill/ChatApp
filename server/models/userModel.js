@@ -23,9 +23,29 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
   avatarImage: {
     type: String,
     default: "",
+  },
+  securityQuestion: {
+    type: String,
+    required: false,
+  },
+  securityAnswer: {
+    type: String,
+    required: false,
+  },
+  otp: {
+    type: String,
+    required: false,
+  },
+  otpExpiry: {
+    type: Date,
+    required: false,
   },
 });
 
