@@ -30,7 +30,7 @@ server/
 ├── .env                   # Environment variables (NOT committed)
 ├── controllers/
 │   ├── userController.js  # Auth (register, verify OTP, login, setAvatar, search, contacts)
-│   ├── messageController.js # addMessage, getMessages, markAsRead
+│   ├── messageController.js # addMessage, getMessages (supports pagination), markAsRead
 │   └── requestController.js # sendRequest, respondRequest, getRequests
 ├── models/
 │   ├── userModel.js       # Mongoose User schema (isVerified, OTP details)
@@ -68,13 +68,13 @@ MAIL_PORT = 587
 The entry point configures the Express middleware (JSON parsing, CORS), registers auth and message routes, connects to MongoDB, performs a legacy user database migration, and boots the real-time Socket.IO server.
 
 - **Legacy User Migration**: When the database connects, a startup script runs `User.updateMany({ isVerified: { $exists: false } }, { $set: { isVerified: true } })` to set verification status for users registered before the OTP feature.
-- **Socket.IO Event Handlers**:
-  - `add-user`: Maps client `userId` to `socket.id` in `onlineUsers` map; broadcasts `reload` to other users.
-  - `send-msg`: Relays a chat message to the recipient's socket if online.
-  - `setType`: Relays typing state updates to the recipient's socket if online.
-  - `send-request`: Relays real-time message request notifications.
-  - `request-response`: Relays request acceptance/rejection notification state.
-  - `disconnect`: Cleanly removes the user socket map registration on socket closure.
+- **Socket.IO Event Handlers & Payloads**:
+  - `add-user` (Inbound): Receives `{ userId }` from the client. Maps the user ID to the socket's unique ID in the `onlineUsers` map and broadcasts the `reload` event to all other clients to update contact list displays.
+  - `send-msg` (Inbound): Receives `{ to, from, msg }` containing the recipient's user ID, sender's user ID, and the raw text message. Server checks if the recipient's socket ID is registered in `onlineUsers` and forwards a `msg-recieve` event with `{ from, msg }`.
+  - `setType` (Inbound): Receives `{ isTyping, from, to }`. Relays typing state updates via the `typeStatus` event containing `{ typeStatus: isTyping, from }` to the recipient if they are online.
+  - `send-request` (Inbound): Receives `{ from, to, request }`. Relays the inbound message request to the recipient socket using the `request` event containing `{ request, from }`.
+  - `request-response` (Inbound): Receives `{ from, to, status }`. Relays the request approval/rejection state to the sender socket using the `request-response` event containing `{ status, from }`.
+  - `disconnect` (Event): Fires automatically when a socket closes. Cleanly deletes the associated socket mapping from the `onlineUsers` map and alerts other sockets.
 
 ---
 
@@ -93,8 +93,6 @@ Stores user account data including password hash, avatar details, verification f
 - `otp`: String (6-digit OTP code, temporary).
 - `otpExpiry`: Date (OTP expiration timestamp).
 
----
-
 ### 5.2 Message Model — `models/messageModel.js`
 
 Stores chat message records.
@@ -103,8 +101,6 @@ Stores chat message records.
 - `users`: Array of Strings `[senderId, receiverId]`.
 - `isRead`: Boolean (default `false`, marks if the recipient viewed the message).
 - `timestamps`: Enabled (`createdAt`, `updatedAt`).
-
----
 
 ### 5.3 Message Request Model — `models/messageRequestModel.js`
 
@@ -143,7 +139,7 @@ Stores connection requests for messaging authorization.
 | Method | Endpoint | Controller | Description |
 |---|---|---|---|
 | POST | `/api/messages/addmsg/` | `addMessage` | Encrypt and store chat message |
-| POST | `/api/messages/getmsg/` | `getMessages` | Retrieve, mark read, and decrypt chat history |
+| POST | `/api/messages/getmsg/` | `getMessages` | Retrieve, mark read, and decrypt chat history. Optionally accepts `page` and `limit` in request body for paginated results (returns `{ messages, hasMore }`), falling back to full history if parameters are missing. |
 | POST | `/api/messages/markread/` | `markAsRead` | Explicitly mark messages as read |
 
 ---
