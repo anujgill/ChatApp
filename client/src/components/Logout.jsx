@@ -64,9 +64,9 @@ const Button = styled.button`
   justify-content: center;
   align-items: center;
   padding: 0.6rem;
-  border-radius: 8px;
-  background-color: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 50px;
+  background-color: var(--color-terracotta-light);
+  border: 1px solid var(--bg-tertiary);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -74,7 +74,7 @@ const Button = styled.button`
   
   svg {
     font-size: 1.3rem;
-    color: #ef4444;
+    color: var(--color-terracotta);
     transition: transform 0.3s ease;
   }
 
@@ -84,7 +84,7 @@ const Button = styled.button`
     overflow: hidden;
     white-space: nowrap;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #ef4444;
+    color: var(--color-terracotta);
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -92,9 +92,9 @@ const Button = styled.button`
   &:hover {
     max-width: 120px;
     padding: 0.6rem 1rem;
-    background-color: #ef4444;
-    border-color: #ef4444;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background-color: var(--color-terracotta);
+    border-color: var(--color-terracotta);
+    box-shadow: var(--shadow-md);
 
     svg {
       color: white;
@@ -116,9 +116,9 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(61, 50, 41, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -132,15 +132,15 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background-color: #111122;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--bg-tertiary);
+  border-radius: 20px;
   padding: 2rem;
   width: 90%;
   max-width: 380px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   text-align: center;
-  color: white;
+  color: var(--text-primary);
   animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   @keyframes scaleUp {
@@ -150,13 +150,14 @@ const ModalContent = styled.div`
 
   h3 {
     margin: 0 0 0.8rem 0;
-    font-size: 1.4rem;
-    color: #ef4444;
+    font-size: 1.5rem;
+    color: var(--color-terracotta);
+    font-family: var(--font-heading);
   }
 
   p {
     margin: 0 0 1.5rem 0;
-    color: #a0aec0;
+    color: var(--text-secondary);
     font-size: 1rem;
     line-height: 1.5;
   }
@@ -168,31 +169,33 @@ const ModalContent = styled.div`
 
     button {
       padding: 0.7rem 1.5rem;
-      border-radius: 8px;
+      border-radius: 50px;
       font-weight: 600;
       font-size: 0.95rem;
       cursor: pointer;
       border: none;
       transition: all 0.2s ease;
-      width: 100px;
+      width: 110px;
+      font-family: var(--font-heading);
     }
 
     .confirm-btn {
-      background-color: #ef4444;
+      background-color: var(--color-terracotta);
       color: white;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+      box-shadow: var(--shadow-sm);
       &:hover {
-        background-color: #dc2626;
+        background-color: #a85845;
         transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
       }
     }
 
     .cancel-btn {
-      background-color: rgba(255, 255, 255, 0.08);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--text-light);
       &:hover {
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: var(--bg-secondary);
         transform: translateY(-1px);
       }
     }

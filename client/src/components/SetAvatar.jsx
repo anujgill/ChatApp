@@ -19,7 +19,7 @@ export default function SetAvatar() {
     autoClose: 8000,
     pauseOnHover: true,
     draggable: true,
-    theme: "dark",
+    theme: "light",
   };
 
   useEffect(() => {
@@ -95,8 +95,6 @@ export default function SetAvatar() {
   return (
     <>
       <Container>
-        <div className="glow-orb glow-orb-1"></div>
-        <div className="glow-orb glow-orb-2"></div>
         {isLoading ? (
           <img src={loader} alt="loader" className="loader" />
         ) : (
@@ -147,35 +145,12 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: #07070c;
-  background-image: radial-gradient(circle at 50% -20%, #171635 0%, #07070c 75%);
+  background-color: var(--bg-primary);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
-
-  .glow-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.12;
-    z-index: 0;
-  }
-  .glow-orb-1 {
-    width: 400px;
-    height: 400px;
-    background-color: #6366f1;
-    top: 10%;
-    right: 15%;
-  }
-  .glow-orb-2 {
-    width: 350px;
-    height: 350px;
-    background-color: #a855f7;
-    bottom: 10%;
-    left: 15%;
-  }
 
   .loader {
     max-inline-size: 100%;
@@ -187,13 +162,11 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 3rem;
-    background-color: rgba(12, 12, 22, 0.5);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--bg-tertiary);
     border-radius: 24px;
     padding: 3rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-lg);
     z-index: 1;
     width: 90%;
     max-width: 600px;
@@ -202,15 +175,12 @@ const Container = styled.div`
 
   .title-container {
     h1 {
-      color: white;
+      color: var(--text-primary);
       text-align: center;
       margin: 0;
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-family: var(--font-heading);
     }
   }
 
@@ -222,31 +192,31 @@ const Container = styled.div`
 
     .avatar {
       cursor: pointer;
-      border: 2px solid rgba(255, 255, 255, 0.06);
+      border: 2px solid var(--bg-tertiary);
       padding: 0.4rem;
-      border-radius: 50%;
+      border-radius: 30%;
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background-color: rgba(255, 255, 255, 0.03);
+      transition: all 0.25s ease;
+      background-color: var(--bg-primary);
 
       img {
         height: 5.5rem;
         width: 5.5rem;
-        transition: transform 0.3s ease;
+        transition: transform 0.25s ease;
       }
 
       &:hover {
-        border-color: #6366f1;
+        border-color: var(--color-teal);
         transform: scale(1.05);
       }
     }
 
     .selected {
-      border: 3px solid #6366f1;
-      background-color: rgba(99, 102, 241, 0.1);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      border: 3px solid var(--color-teal);
+      background-color: var(--color-teal-light);
+      box-shadow: 0 0 20px var(--color-teal-light);
     }
   }
 
@@ -259,23 +229,22 @@ const Container = styled.div`
   }
 
   .submit-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    background: var(--color-teal);
     color: white;
     padding: 0.95rem 1.8rem;
     border: none;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 50px;
     font-size: 0.9rem;
-    text-transform: uppercase;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
-    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-heading);
 
     &:hover {
-      background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(124, 58, 237, 0.5);
+      background: #235346;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     &:active {
@@ -285,21 +254,19 @@ const Container = styled.div`
 
   .shuffle-btn {
     background: transparent;
-    color: #a5b4fc;
-    border: 1px solid rgba(165, 180, 252, 0.4);
+    color: var(--text-secondary);
+    border: 1px solid var(--text-light);
     padding: 0.95rem 1.8rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 50px;
     font-size: 0.9rem;
-    text-transform: uppercase;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    font-family: var(--font-heading);
 
     &:hover:not(:disabled) {
-      background: rgba(165, 180, 252, 0.1);
-      border-color: #a5b4fc;
-      transform: translateY(-2px);
+      background: var(--bg-primary);
+      transform: translateY(-1px);
     }
 
     &:disabled {

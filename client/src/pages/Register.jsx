@@ -24,7 +24,7 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
-  const [otp, setOtp] = useState("");
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -33,7 +33,7 @@ export default function Register() {
     autoClose: 3000,
     pauseOnHover: true,
     draggable: true,
-    theme: "dark",
+    theme: "light",
   };
 
   const handleValidation = () => {
@@ -83,14 +83,15 @@ export default function Register() {
 
   const handleVerifyOTP = async (event) => {
     event.preventDefault();
-    if (otp.trim().length !== 6) {
+    const finalOtp = otpValues.join("");
+    if (finalOtp.trim().length !== 6) {
       toast.error("Please enter a valid 6-digit OTP code.", toastOptions);
       return;
     }
     try {
       const { data } = await axios.post(verifyRegisterRoute, {
         username: values.username,
-        otp,
+        otp: finalOtp,
       });
       if (data.status === false) {
         toast.error(data.msg, toastOptions);
@@ -107,6 +108,24 @@ export default function Register() {
     }
   };
 
+  const handleOtpChange = (element, index) => {
+    if (isNaN(element.value)) return false;
+    const newOtp = [...otpValues];
+    newOtp[index] = element.value;
+    setOtpValues(newOtp);
+
+    // Focus next input
+    if (element.nextSibling && element.value !== "") {
+      element.nextSibling.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === "Backspace" && otpValues[index] === "" && e.target.previousSibling) {
+      e.target.previousSibling.focus();
+    }
+  };
+
   function handleChange(event) {
     setValues({ ...values, [event.target.name]: event.target.value });
   }
@@ -114,91 +133,137 @@ export default function Register() {
   return (
     <>
       <FormContainer>
-        <div className="glow-orb glow-orb-1"></div>
-        <div className="glow-orb glow-orb-2"></div>
-
-        {step === 1 && (
-          <form onSubmit={(event) => handleSubmitStep1(event)}>
+        <div className="left-panel">
+          <div className="left-content">
             <div className="brand">
               <img src={Logo} alt="logo" />
               <h1>WhispR</h1>
             </div>
-            <h2>Create Account</h2>
-            <p className="subtitle">Sign up to start messaging securely</p>
-            <input
-              type="text"
-              placeholder="Username"
-              name="username"
-              maxLength="20"
-              value={values.username}
-              onChange={(e) => handleChange(e)}
-            />
-            <input
-              type="email"
-              placeholder="Email Address"
-              name="email"
-              value={values.email}
-              onChange={(e) => handleChange(e)}
-            />
-            <div className="password-input-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                name="password"
-                value={values.password}
-                onChange={(e) => handleChange(e)}
-              />
-              <div className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+            <p className="left-tagline">Join a beautiful, private space for conversations that feel natural.</p>
+            <div className="left-decor">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#e6eee9" d="M37.8,-63.9C49.9,-56.9,61.4,-47.9,68.9,-36.1C76.4,-24.3,79.8,-9.6,78.2,4.5C76.6,18.6,70,32.2,61.1,43.7C52.3,55.3,41.2,64.9,28.2,70.5C15.2,76,-0.3,77.5,-16,74.5C-31.7,71.5,-47.5,64.1,-58.8,52.6C-70.1,41.2,-76.9,25.8,-79.8,9.5C-82.6,-6.9,-81.4,-24.2,-73.8,-37.9C-66.2,-51.6,-52.1,-61.8,-37.9,-67.6C-23.7,-73.4,-9.4,-74.8,2.7,-79.4C14.7,-84.1,25.6,-70.9,37.8,-63.9Z" transform="translate(100 100)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div className="right-panel">
+          {step === 1 && (
+            <form onSubmit={(event) => handleSubmitStep1(event)}>
+              <div className="step-indicator">
+                <div className="step-dot active"></div>
+                <div className="step-line"></div>
+                <div className="step-dot"></div>
               </div>
-            </div>
-            <div className="password-input-wrapper">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                name="confirmPassword"
-                value={values.confirmPassword}
-                onChange={(e) => handleChange(e)}
-              />
-              <div className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+
+              <h2>Create Account</h2>
+              <p className="subtitle">Sign up to start messaging securely</p>
+              
+              <div className="input-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="e.g. johndoe"
+                  name="username"
+                  maxLength="20"
+                  value={values.username}
+                  onChange={(e) => handleChange(e)}
+                />
               </div>
-            </div>
 
-            <button type="submit">Send Code</button>
-            <span>
-              Already have an account? <Link to="/login">Login</Link>
-            </span>
-          </form>
-        )}
+              <div className="input-group">
+                <label htmlFor="email">Email Address</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="e.g. john@example.com"
+                  name="email"
+                  value={values.email}
+                  onChange={(e) => handleChange(e)}
+                />
+              </div>
 
-        {step === 2 && (
-          <form onSubmit={(event) => handleVerifyOTP(event)}>
-            <div className="brand">
-              <img src={Logo} alt="logo" />
-              <h1>WhispR</h1>
-            </div>
-            <h2>Verify Email</h2>
-            <p className="instruction">
-              We have sent a 6-digit OTP code to: <br />
-              <strong>{values.email}</strong>.
-            </p>
-            <input
-              type="text"
-              placeholder="6-Digit OTP"
-              maxLength="6"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="otp-input"
-            />
-            <button type="submit">Verify & Register</button>
-            <div className="back-link">
-              <button className="text-btn" type="button" onClick={() => setStep(1)}>
-                Back
-              </button>
-            </div>
-          </form>
-        )}
+              <div className="input-group">
+                <label htmlFor="password">Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min 8 characters"
+                    name="password"
+                    value={values.password}
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <div className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </div>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Repeat password"
+                    name="confirmPassword"
+                    value={values.confirmPassword}
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <div className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit">Send Code</button>
+              <span>
+                Already have an account? <Link to="/login">Login</Link>
+              </span>
+            </form>
+          )}
+
+          {step === 2 && (
+            <form onSubmit={(event) => handleVerifyOTP(event)}>
+              <div className="step-indicator">
+                <div className="step-dot active"></div>
+                <div className="step-line active"></div>
+                <div className="step-dot active"></div>
+              </div>
+
+              <h2>Verify Email</h2>
+              <p className="instruction">
+                We sent a 6-digit OTP code to: <br />
+                <strong>{values.email}</strong>
+              </p>
+              
+              <div className="otp-container">
+                {otpValues.map((data, index) => (
+                  <input
+                    className="otp-field"
+                    type="text"
+                    name="otp"
+                    maxLength="1"
+                    key={index}
+                    value={data}
+                    onChange={(e) => handleOtpChange(e.target, index)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                    onFocus={(e) => e.target.select()}
+                  />
+                ))}
+              </div>
+
+              <button type="submit">Verify & Register</button>
+              <div className="back-link">
+                <button className="text-btn" type="button" onClick={() => setStep(1)}>
+                  Back
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </FormContainer>
       <ToastContainer />
     </>
@@ -209,188 +274,269 @@ const FormContainer = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #07070c;
-  background-image: radial-gradient(circle at 50% -20%, #171635 0%, #07070c 75%);
-  padding: 2rem;
+  background-color: var(--bg-primary);
   overflow: hidden;
-  position: relative;
   box-sizing: border-box;
 
-  .glow-orb {
+  .left-panel {
+    flex: 1.1;
+    background-color: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--bg-tertiary);
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .left-content {
+    max-width: 440px;
+    z-index: 2;
+    text-align: left;
+  }
+
+  .left-decor {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.12;
-    z-index: 0;
+    width: 420px;
+    height: 420px;
+    top: -10%;
+    right: -10%;
+    z-index: 1;
+    opacity: 0.6;
+    animation: float-rev 15s ease-in-out infinite;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
-  .glow-orb-1 {
-    width: 400px;
-    height: 400px;
-    background-color: #6366f1;
-    top: 10%;
-    right: 15%;
-  }
-  .glow-orb-2 {
-    width: 350px;
-    height: 350px;
-    background-color: #a855f7;
-    bottom: 10%;
-    left: 15%;
+
+  @keyframes float-rev {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(15px) rotate(-8deg); }
   }
 
   .brand {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-bottom: 1.5rem;
-    justify-content: center;
+    margin-bottom: 2rem;
 
     img {
       height: 3.5rem;
-      border-radius: 50%;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      border-radius: 30%;
+      box-shadow: var(--shadow-md);
     }
 
     h1 {
-      color: white;
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
+      color: var(--color-teal);
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
       margin: 0;
     }
   }
 
+  .left-tagline {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+  }
+
+  .right-panel {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--bg-primary);
+    overflow-y: auto;
+  }
+
   form {
     width: 100%;
-    max-width: 420px;
-    background-color: rgba(12, 12, 22, 0.5);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 24px;
-    padding: 2.5rem 2.2rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    max-width: 380px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    z-index: 1;
 
     h2 {
-      color: white;
-      text-align: center;
+      color: var(--text-primary);
       margin: 0 0 0.4rem 0;
-      font-size: 1.6rem;
+      font-size: 2.2rem;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
     }
 
     p.subtitle {
-      color: #94a3b8;
-      text-align: center;
-      font-size: 0.9rem;
-      margin: 0 0 1.8rem 0;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin: 0 0 1.5rem 0;
     }
 
     p.instruction {
-      color: #94a3b8;
-      text-align: center;
-      font-size: 0.9rem;
-      margin: 0 0 1.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin: 0 0 2rem 0;
       line-height: 1.5;
 
       strong {
-        color: #e2e8f0;
+        color: var(--color-teal);
       }
     }
   }
 
-  input {
-    background-color: rgba(255, 255, 255, 0.03);
-    padding: 0.9rem 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    color: white;
-    width: calc(100% - 2.2rem);
-    font-size: 0.95rem;
-    margin-bottom: 1.2rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: inherit;
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    align-self: flex-start;
 
-    &::placeholder {
-      color: #64748b;
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--bg-tertiary);
+      transition: all 0.3s ease;
+
+      &.active {
+        background-color: var(--color-teal);
+        box-shadow: 0 0 0 3px var(--color-teal-light);
+      }
     }
 
-    &:focus {
-      border-color: #6366f1;
-      background-color: rgba(255, 255, 255, 0.05);
-      outline: none;
-      box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
+    .step-line {
+      width: 30px;
+      height: 2px;
+      background-color: var(--bg-tertiary);
+      transition: all 0.3s ease;
+
+      &.active {
+        background-color: var(--color-teal);
+      }
     }
   }
 
-  .otp-input {
-    text-align: center;
-    font-size: 1.5rem;
-    letter-spacing: 0.4rem;
-    font-weight: bold;
-    color: #a5b4fc;
-    width: calc(100% - 2.2rem);
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    width: 100%;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.3px;
+    }
+  }
+
+  input {
+    background-color: var(--bg-secondary);
+    padding: 0.9rem 1.1rem;
+    border: 1px solid transparent;
+    border-radius: 50px;
+    color: var(--text-primary);
+    width: 100%;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: var(--text-light);
+      opacity: 0.7;
+    }
+
+    &:focus {
+      border-color: var(--color-teal);
+      background-color: var(--bg-primary);
+      outline: none;
+      box-shadow: 0 0 0 4px var(--color-teal-light);
+    }
   }
 
   .password-input-wrapper {
     position: relative;
     width: 100%;
-    margin-bottom: 1.2rem;
 
     input {
-      margin-bottom: 0;
-      width: calc(100% - 3.2rem);
-      padding-right: 2.1rem;
+      padding-right: 3rem;
     }
 
     .toggle-password {
       position: absolute;
-      right: 1.1rem;
+      right: 1.2rem;
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;
       display: flex;
       align-items: center;
-      color: #64748b;
+      color: var(--text-light);
       font-size: 1.25rem;
       transition: color 0.2s ease;
       
       &:hover {
-        color: #818cf8;
+        color: var(--color-teal);
+      }
+    }
+  }
+
+  .otp-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+
+    .otp-field {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border-radius: 12px;
+      background-color: var(--bg-secondary);
+      border: 1px solid transparent;
+
+      &:focus {
+        border-color: var(--color-teal);
+        box-shadow: 0 0 0 4px var(--color-teal-light);
       }
     }
   }
 
   button[type="submit"] {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    background: var(--color-teal);
     color: white;
     padding: 0.95rem 2rem;
     border: none;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 50px;
     font-size: 0.95rem;
-    text-transform: uppercase;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-bottom: 1.2rem;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
-    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    font-family: var(--font-heading);
+    width: 100%;
 
     &:hover {
-      background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(124, 58, 237, 0.5);
+      background: #235346;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
     }
 
     &:active {
@@ -399,19 +545,18 @@ const FormContainer = styled.div`
   }
 
   span {
-    color: #64748b;
+    color: var(--text-light);
     font-size: 0.85rem;
     text-align: center;
-    letter-spacing: 0.3px;
 
     a {
-      color: #818cf8;
+      color: var(--color-teal);
       text-decoration: none;
-      font-weight: 700;
+      font-weight: 600;
       transition: color 0.2s ease;
 
       &:hover {
-        color: #a5b4fc;
+        color: #235346;
         text-decoration: underline;
       }
     }
@@ -424,15 +569,15 @@ const FormContainer = styled.div`
     .text-btn {
       background: none;
       border: none;
-      color: #818cf8;
+      color: var(--color-terracotta);
       cursor: pointer;
       font-size: 0.9rem;
-      font-weight: bold;
+      font-weight: 600;
       padding: 0;
       transition: color 0.2s ease;
       
       &:hover {
-        color: #a5b4fc;
+        color: var(--text-primary);
         text-decoration: underline;
       }
     }

@@ -258,19 +258,21 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 12% 76% 12%;
+  grid-template-rows: 10% 78% 12%;
   gap: 0.1rem;
   overflow: hidden;
   height: 100%;
-  background-color: rgba(12, 12, 22, 0.35);
+  background-color: var(--bg-primary);
 
   .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
-    background-color: rgba(0, 0, 0, 0.15);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--bg-tertiary);
+    box-shadow: var(--shadow-sm);
+    z-index: 5;
 
     .user-details {
       display: flex;
@@ -280,23 +282,24 @@ const Container = styled.div`
         img {
           height: 2.6rem;
           width: 2.6rem;
-          border-radius: 50%;
-          border: 1.5px solid rgba(255, 255, 255, 0.08);
+          border-radius: 30%;
+          border: 1.5px solid var(--bg-tertiary);
         }
       }
       .username {
         display: flex;
         flex-direction: column;
         h3 {
-          color: white;
+          color: var(--text-primary);
           margin: 0 0 0.15rem 0;
           font-size: 1rem;
           font-weight: 600;
+          font-family: var(--font-heading);
         }
         .status {
           font-size: 0.75rem;
           font-weight: 600;
-          color: #10b981;
+          color: var(--color-teal);
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -317,19 +320,19 @@ const Container = styled.div`
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      background: var(--color-terracotta);
       color: white;
       padding: 0.6rem 1.2rem;
       border-radius: 2rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      box-shadow: 0 4px 15px rgba(194, 112, 91, 0.4);
       z-index: 10;
       animation: bounce 2s infinite;
       font-size: 0.85rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--bg-tertiary);
       &:hover {
-        background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+        background: #a85845;
       }
     }
 
@@ -356,17 +359,17 @@ const Container = styled.div`
       .unread-line {
         flex: 1;
         height: 1px;
-        background-color: rgba(99, 102, 241, 0.2);
+        background-color: var(--bg-tertiary);
       }
 
       .unread-label {
-        background-color: rgba(99, 102, 241, 0.1);
-        color: #a5b4fc;
+        background-color: var(--color-terracotta-light);
+        color: var(--color-terracotta);
         padding: 0.4rem 1rem;
         border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 700;
-        border: 1px solid rgba(99, 102, 241, 0.2);
+        border: 1px solid var(--color-terracotta-light);
         text-transform: uppercase;
         letter-spacing: 1.5px;
       }
@@ -379,13 +382,6 @@ const Container = styled.div`
       flex-direction: column;
       gap: 1.2rem;
       overflow: auto;
-      &::-webkit-scrollbar {
-        width: 0.2rem;
-        &-thumb {
-          background-color: rgba(255, 255, 255, 0.08);
-          border-radius: 1rem;
-        }
-      }
     }
 
     .message {
@@ -397,7 +393,7 @@ const Container = styled.div`
         padding: 0.9rem 1.1rem;
         font-size: 0.95rem;
         line-height: 1.45;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        box-shadow: var(--shadow-sm);
         @media screen and (min-width: 720px) and (max-width: 1080px) {
           max-width: 75%;
         }
@@ -411,20 +407,18 @@ const Container = styled.div`
     .sended {
       justify-content: flex-end;
       .content {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(124, 58, 237, 0.12) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.25);
-        color: #e2e8f0;
-        border-radius: 16px 16px 4px 16px;
+        background: var(--color-teal);
+        color: white;
+        border-radius: 20px 20px 4px 20px;
       }
     }
 
     .recieved {
       justify-content: flex-start;
       .content {
-        background-color: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        color: #cbd5e1;
-        border-radius: 16px 16px 16px 4px;
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        border-radius: 20px 20px 20px 4px;
       }
     }
   }

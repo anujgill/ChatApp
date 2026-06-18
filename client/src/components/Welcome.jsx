@@ -16,12 +16,14 @@ export default function Welcome({socket}) {
   }, []);
   return (
     <Container>
-      <Logout socket={socket}/>
-      <img src={GIF} alt="" />
+      <div className="logout-wrapper">
+        <Logout socket={socket}/>
+      </div>
+      <img src={GIF} alt="Welcome" />
       <h1>
         Welcome, <span>{userName}!</span>
       </h1>
-      <h3>Please select a chat to Start messaging.</h3>
+      <h3>Please select a chat to start messaging.</h3>
     </Container>
   );
 }
@@ -30,38 +32,45 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: var(--text-primary);
   flex-direction: column;
-  background-color: rgba(12, 12, 22, 0.25);
+  background-color: var(--bg-primary);
   position: relative;
   height: 100%;
+  width: 100%;
+
+  .logout-wrapper {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+  }
 
   img {
     height: 15rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    box-shadow: var(--shadow-md);
     margin-bottom: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 3px solid var(--bg-secondary);
   }
 
   h1 {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     text-align: center;
+    font-family: var(--font-heading);
+    
     span {
-      background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 800;
+      color: var(--color-teal);
+      font-weight: 700;
     }
   }
 
   h3 {
-    color: #64748b;
-    font-size: 1rem;
-    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 400;
     text-align: center;
-    letter-spacing: 0.5px;
+    margin: 0;
   }
 `;

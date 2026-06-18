@@ -143,8 +143,6 @@ function Chat() {
   return (
     <>
       <Container>
-        <div className="glow-orb glow-orb-1"></div>
-        <div className="glow-orb glow-orb-2"></div>
         <div className="container">
           <Contacts 
             currentUser={currentUser} 
@@ -172,50 +170,21 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #07070c;
-  background-image: radial-gradient(circle at 50% -20%, #171635 0%, #07070c 75%);
-  position: relative;
+  background-color: var(--bg-primary);
   overflow: hidden;
 
-  .glow-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.1;
-    z-index: 0;
-  }
-  .glow-orb-1 {
-    width: 500px;
-    height: 500px;
-    background-color: #6366f1;
-    top: -10%;
-    right: 10%;
-  }
-  .glow-orb-2 {
-    width: 400px;
-    height: 400px;
-    background-color: #a855f7;
-    bottom: -10%;
-    left: 10%;
-  }
-
   .container {
-    height: 85vh;
-    width: 85vw;
-    max-width: 1280px;
-    background-color: rgba(10, 10, 22, 0.45);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.05);
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-primary);
     display: grid;
-    grid-template-columns: 30% 70%;
-    @media screen and (min-width: 720px) and (max-width: 1080px) {
-      grid-template-columns: 38% 62%;
-    }
-    border-radius: 24px;
+    grid-template-columns: 340px 1fr;
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
-    z-index: 1;
+    
+    @media screen and (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
   }
 `;
 

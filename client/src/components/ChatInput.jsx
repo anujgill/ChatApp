@@ -84,14 +84,14 @@ export default function ChatInput({ handleSendMsg, handleTypeState }) {
         <div className="emoji" ref={emojiRef}>
           <BsEmojiSmileFill onClick={handleEmojiPickerhideShow} />
           {showEmojiPicker && (
-            <Picker onEmojiClick={handleEmojiClick} theme={Theme.DARK} />
+            <Picker onEmojiClick={handleEmojiClick} theme={Theme.LIGHT} />
           )}
         </div>
       </div>
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
         <textarea
           ref={textareaRef}
-          placeholder="type your message here"
+          placeholder="Type your message here..."
           onChange={(e) => handleTyping(e)}
           onKeyDown={handleKeyDown}
           value={msg}
@@ -105,85 +105,105 @@ export default function ChatInput({ handleSendMsg, handleTypeState }) {
 }
 
 const Container = styled.div`
-  border-radius: 0 0 50px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #080420;
-  padding: 0 2rem;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--bg-tertiary);
+  padding: 0.8rem 2rem;
 
   @media screen and (min-width: 720px) and (max-width: 1080px) {
-    padding: 0 1rem;
+    padding: 0.8rem 1rem;
   }
 
   .emoji {
     position: relative;
+    display: flex;
+    align-items: center;
+    
     svg {
-      font-size: 1.5rem;
-      color: #ffff00c8;
+      font-size: 1.6rem;
+      color: var(--color-amber);
       cursor: pointer;
+      transition: transform 0.2s ease;
+      &:hover {
+        transform: scale(1.1);
+      }
     }
     .EmojiPickerReact {
       position: absolute !important;
       bottom: 60px;
       left: 0;
-      box-shadow: 0 5px 10px #9a86f3;
-      border-color: #9a86f3;
+      box-shadow: var(--shadow-lg);
+      border-color: var(--bg-tertiary) !important;
+      border-radius: 16px;
     }
   }
 
   .input-container {
     flex-grow: 1;
-    margin-left: 1rem;
-    border-radius: 2rem;
+    margin-left: 1.2rem;
+    border-radius: 24px;
     display: flex;
     align-items: center;
     gap: 1rem;
-    background-color: #ffffff34;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--bg-tertiary);
+    padding: 0.3rem 0.5rem 0.3rem 1.2rem;
+    transition: all 0.25s ease;
+
+    &:focus-within {
+      background-color: var(--bg-primary);
+      border-color: var(--color-teal);
+      box-shadow: 0 0 0 3px var(--color-teal-light);
+    }
 
     textarea {
       flex: 1;
       background: transparent;
       border: none;
-      color: white;
-      font-size: 1.2rem;
-      padding-left: 0.5rem;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      padding: 0.3rem 0;
       resize: none;
       min-height: 1.5rem;
-      max-height: 120px;
+      max-height: 100px;
       height: 1.5rem;
       line-height: 1.5rem;
       overflow-y: auto;
+      font-family: inherit;
+
       &::placeholder {
-        color: #aaa;
+        color: var(--text-light);
+        opacity: 0.8;
       }
       &:focus {
         outline: none;
       }
-      &::-webkit-scrollbar {
-        width: 4px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background-color: #9a86f3;
-        border-radius: 10px;
-      }
     }
 
     button {
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      background-color: #9a86f3;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--color-teal);
       border: none;
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+
+      &:hover {
+        background-color: #235346;
+        transform: scale(1.05);
+      }
 
       svg {
-        font-size: 2rem;
+        font-size: 1.1rem;
         color: white;
       }
     }
   }
 `;
-
-
