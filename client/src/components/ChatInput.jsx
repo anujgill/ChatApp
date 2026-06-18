@@ -41,8 +41,12 @@ export default function ChatInput({ handleSendMsg, handleTypeState }) {
 
     // Auto resize
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      if (val === "") {
+        textareaRef.current.style.height = "1.5rem";
+      } else {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      }
     }
   };
 

@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 module.exports.getMessages = async (req, res, next) => {
   try {
     const { from, to } = req.body;
+    const page = req.body.page ? parseInt(req.body.page) : null;
+    const limit = req.body.limit ? parseInt(req.body.limit) : null;
 
     // Mark messages from 'to' (contact) to 'from' (current user) as read
     await Messages.updateMany(
@@ -26,20 +28,53 @@ module.exports.getMessages = async (req, res, next) => {
       }
     );
 
-    const messages = await Messages.find({
-      users: {
-        $all: [from, to],
-      },
-    }).sort({ updatedAt: 1 });
+    if (page && limit) {
+      const skip = (page - 1) * limit;
+      const totalMessages = await Messages.countDocuments({
+        users: {
+          $all: [from, to],
+        },
+      });
 
-    const projectedMessages = messages.map((msg) => {
-      return {
-        _id: msg._id,
-        fromSelf: msg.users[0].toString() === from,
-        message: decryptMessage(msg.message.text),
-      };
-    });
-    return res.json(projectedMessages);
+      const messages = await Messages.find({
+        users: {
+          $all: [from, to],
+        },
+      })
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      const projectedMessages = messages.map((msg) => {
+        return {
+          _id: msg._id,
+          fromSelf: msg.users[0].toString() === from,
+          message: decryptMessage(msg.message.text),
+        };
+      });
+
+      projectedMessages.reverse();
+
+      return res.json({
+        messages: projectedMessages,
+        hasMore: skip + messages.length < totalMessages,
+      });
+    } else {
+      const messages = await Messages.find({
+        users: {
+          $all: [from, to],
+        },
+      }).sort({ updatedAt: 1 });
+
+      const projectedMessages = messages.map((msg) => {
+        return {
+          _id: msg._id,
+          fromSelf: msg.users[0].toString() === from,
+          message: decryptMessage(msg.message.text),
+        };
+      });
+      return res.json(projectedMessages);
+    }
   } catch (error) {
     console.error(error);
     return res.json({ status: false, msg: "Internal Server Error" });

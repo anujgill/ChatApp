@@ -7,11 +7,16 @@ import { sendMessageRoute, recieveMessageRoute, markAsReadRoute } from "../utils
 
 export default function ChatContainer({currentUser, currentChat, socket, onlineUsers }) {
   const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  
   const scrollRef = useRef();
   const chatMessagesRef = useRef();
   const unreadDividerRef = useRef(null);
   const currChat = useRef();
   const isInitialLoad = useRef(true);
+  const lastMessageIdRef = useRef(null);
   
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -29,9 +34,13 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
         const response = await axios.post(recieveMessageRoute, {
           from: currentUser._id,
           to: currentChat._id,
+          page: 1,
+          limit: 20,
         });
-        const fetchedMessages = response.data;
+        const { messages: fetchedMessages, hasMore: more } = response.data;
         setMessages(fetchedMessages);
+        setPage(1);
+        setHasMore(more);
         setNewMessagesCount(0);
         setIsUserScrolledUp(false);
         isInitialLoad.current = true;
@@ -50,6 +59,39 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
     };
     func();
   }, [currentChat]);
+
+  const loadMoreMessages = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    
+    const container = chatMessagesRef.current;
+    const oldScrollHeight = container ? container.scrollHeight : 0;
+    
+    try {
+      const nextPage = page + 1;
+      const response = await axios.post(recieveMessageRoute, {
+        from: currentUser._id,
+        to: currentChat._id,
+        page: nextPage,
+        limit: 20,
+      });
+      const { messages: fetchedMessages, hasMore: more } = response.data;
+      
+      setMessages((prev) => [...fetchedMessages, ...prev]);
+      setPage(nextPage);
+      setHasMore(more);
+      
+      setTimeout(() => {
+        if (container) {
+          container.scrollTop = container.scrollHeight - oldScrollHeight;
+        }
+      }, 0);
+    } catch (error) {
+      console.error("Error loading older messages:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // typing emit
   useEffect(() => {
@@ -133,6 +175,7 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
           to: currentUser._id,
         }).catch((err) => console.error("Error marking message as read:", err));
       }
+      setArrivalMessage(null);
     }
   }, [arrivalMessage, currentChat, currentUser]);
 
@@ -155,12 +198,20 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
       } else {
         setIsUserScrolledUp(true);
       }
+
+      if (scrollTop < 10 && hasMore && !loadingMore && !isInitialLoad.current) {
+        loadMoreMessages();
+      }
     }
   };
 
   // Scroll logic on messages change
   useEffect(() => {
     if (messages.length === 0) return;
+    
+    const lastMessage = messages[messages.length - 1];
+    const lastMessageId = lastMessage ? (lastMessage._id || lastMessage.message) : null;
+
     if (isInitialLoad.current) {
       if (firstUnreadMessageId && unreadDividerRef.current) {
         unreadDividerRef.current.scrollIntoView({ behavior: "auto", block: "start" });
@@ -168,12 +219,15 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
         scrollToBottom("auto");
       }
       isInitialLoad.current = false;
+      lastMessageIdRef.current = lastMessageId;
     } else {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.fromSelf || !isUserScrolledUp) {
-        scrollToBottom("smooth");
-      } else {
-        setNewMessagesCount((prev) => prev + 1);
+      if (lastMessageId !== lastMessageIdRef.current) {
+        lastMessageIdRef.current = lastMessageId;
+        if (lastMessage.fromSelf || !isUserScrolledUp) {
+          scrollToBottom("smooth");
+        } else {
+          setNewMessagesCount((prev) => prev + 1);
+        }
       }
     }
   }, [messages, firstUnreadMessageId]);
@@ -208,6 +262,7 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
               ref={chatMessagesRef}
               onScroll={handleScroll}
             >
+              {loadingMore && <div className="loading-more">Loading older messages...</div>}
               {messages.map((message, index) => {
                 const showDivider = firstUnreadMessageId && message._id === firstUnreadMessageId;
                 return (
@@ -314,6 +369,15 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     height: 100%;
+
+    .loading-more {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      padding: 0.5rem 0;
+      font-style: italic;
+      flex-shrink: 0;
+    }
 
     .new-messages-badge {
       position: absolute;
