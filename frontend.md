@@ -143,3 +143,11 @@ Provides unified endpoints pointing to `HOST` (e.g. `http://localhost:4000` or p
 - **Header info**: Shows active contact avatar, username, and typing indicators.
 - **Unread Messages Divider**: If unread messages exist, renders a horizontal message banner above the first unread message, automatically scrolling the container viewport to focus on the banner.
 - **Message List**: Bubbles use custom styled gradients. Decrypts and reads chat history, updating message `isRead` flags automatically.
+
+### 7.3 Set Avatar Selector (`SetAvatar.jsx`)
+- **Interactive Avatar Grid**: Generates a grid of 4 random avatars using the client-side DiceBear JS library.
+- **Lazy Loading**: Imports `@dicebear/core` and `@dicebear/collection` styles dynamically at runtime (`import()`) to keep the main bundle footprint light.
+- **Dynamic Shuffling**: Provides a "Shuffle Avatars" button that re-runs the client-side generator to produce new random avatars instantly.
+- **Aesthetic**: Styled with the dark glassmorphic radial gradient backdrop (`#07070c`), colorful background glowing orbs, and scale animations on selection.
+- **Base64 SVG Conversion**: Converts the SVG output to a base64 string for database storage compatibility.
+

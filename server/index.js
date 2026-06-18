@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -7,7 +8,6 @@ const socket = require("socket.io");
 const User = require('./models/userModel');
 
 const app = express();
-require('dotenv').config();
 
 
 
