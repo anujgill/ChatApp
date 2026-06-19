@@ -45,7 +45,7 @@ const register = async(req,res,next) => {
     return res.json({ status: true, msg: "Verification code sent to your email. Please verify." });
   } catch (error) {
     console.error(error);
-    return res.json({ status: false, msg: "Failed to initiate registration verification. Please check your details." });
+    return res.json({ status: false, msg: "Failed to initiate registration verification. Please check your details.", error: error.message });
   }
 }
 
@@ -79,7 +79,7 @@ const verifyRegister = async (req, res, next) => {
     return res.json({ status: true, user: verifiedUser });
   } catch (error) {
     console.error(error);
-    return res.json({ status: false, msg: "Internal Server Error" });
+    return res.json({ status: false, msg: "Internal Server Error", error: error.message });
   }
 }
 
@@ -101,7 +101,7 @@ const login = async (req,res,next) =>{
     return res.json({ status: true, user });
   } catch (error) {
     console.error(error);
-    return res.json({ status: false, msg: "Internal Server Error" });
+    return res.json({ status: false, msg: "Internal Server Error", error: error.message });
   }
 }
 
@@ -185,7 +185,7 @@ const sendOTP = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
-    return res.json({ status: false, msg: "Failed to send verification code. Please check your credentials." });
+    return res.json({ status: false, msg: "Failed to send verification code. Please check your credentials.", error: error.message });
   }
 };
 
