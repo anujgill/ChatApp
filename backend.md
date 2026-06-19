@@ -146,7 +146,7 @@ Stores connection requests for messaging authorization.
 | Method | Endpoint | Controller | Description |
 |---|---|---|---|
 | POST | `/api/messages/addmsg/` | `addMessage` | Encrypt and store chat message |
-| POST | `/api/messages/getmsg/` | `getMessages` | Retrieve, mark read, and decrypt chat history. Optionally accepts `page` and `limit` in request body for paginated results (returns `{ messages, hasMore }`), falling back to full history if parameters are missing. |
+| POST | `/api/messages/getmsg/` | `getMessages` | Retrieve, mark read, and decrypt chat history in stable chronological order (sorted by `createdAt`). Optionally accepts `page` and `limit` in request body for paginated results (returns `{ messages, hasMore }`), falling back to full history if parameters are missing. |
 | POST | `/api/messages/markread/` | `markAsRead` | Explicitly mark messages as read |
 
 ---

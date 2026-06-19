@@ -189,6 +189,8 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
   - Monitors scrolling: When `scrollTop < 10`, `hasMore` is true, and `isInitialLoad` is false, it requests page `page + 1`.
   - Scroll stabilization: Records scrollHeight metrics before prepends and aligns the scrollbar to retain visual reading focus.
   - Uses `lastMessageIdRef` to prevent bottom scroll triggers when loading older history, ensuring auto-scroll only fires on new incoming/outgoing messages.
+  - Immediate state reset: When `currentChat` changes, all chat-related states (messages, page, unread metadata, etc.) are cleared immediately to prevent leaking state between different chat contacts.
+  - Scroll race condition prevention: Setting `isInitialLoad` to `false` is delayed by `100ms` using a timeout, which allows browser scroll alignment events from layout updates to settle without triggering false top-scroll page fetches.
   - Displays a `.loading-more` loader at the top of the chat panel.
 
 ### 7.3 Chat Input (`ChatInput.jsx`)
