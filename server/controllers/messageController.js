@@ -41,7 +41,7 @@ module.exports.getMessages = async (req, res, next) => {
           $all: [from, to],
         },
       })
-        .sort({ updatedAt: -1 })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
@@ -64,7 +64,7 @@ module.exports.getMessages = async (req, res, next) => {
         users: {
           $all: [from, to],
         },
-      }).sort({ updatedAt: 1 });
+      }).sort({ createdAt: 1 });
 
       const projectedMessages = messages.map((msg) => {
         return {

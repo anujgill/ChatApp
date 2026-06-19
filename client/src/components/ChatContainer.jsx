@@ -29,6 +29,18 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
   const [unreadCountValue, setUnreadCountValue] = useState(0);
 
   useEffect(() => {
+    // Reset state immediately for new chat contact to avoid leaking previous contact's state
+    setMessages([]);
+    setPage(1);
+    setHasMore(false);
+    setLoadingMore(false);
+    setNewMessagesCount(0);
+    setIsUserScrolledUp(false);
+    isInitialLoad.current = true;
+    lastMessageIdRef.current = null;
+    setFirstUnreadMessageId(null);
+    setUnreadCountValue(0);
+
     const func = async () => {
       try {
         const response = await axios.post(recieveMessageRoute, {
@@ -212,13 +224,17 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
     const lastMessage = messages[messages.length - 1];
     const lastMessageId = lastMessage ? (lastMessage._id || lastMessage.message) : null;
 
+    let timer;
     if (isInitialLoad.current) {
       if (firstUnreadMessageId && unreadDividerRef.current) {
         unreadDividerRef.current.scrollIntoView({ behavior: "auto", block: "start" });
       } else {
         scrollToBottom("auto");
       }
-      isInitialLoad.current = false;
+      // Delay setting isInitialLoad to false to allow scroll alignment events to settle
+      timer = setTimeout(() => {
+        isInitialLoad.current = false;
+      }, 100);
       lastMessageIdRef.current = lastMessageId;
     } else {
       if (lastMessageId !== lastMessageIdRef.current) {
@@ -230,6 +246,10 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
         }
       }
     }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [messages, firstUnreadMessageId]);
 
   return (
