@@ -115,7 +115,7 @@ Configures routes inside React Router's `<BrowserRouter>`:
 
 ## 5. API Endpoints — `utils/Api.js`
 
-Maps endpoints to `HOST` (e.g. `http://localhost:4000` or production Render address):
+Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel address `https://api-whispr-messaging.vercel.app`):
 - `registerRoute`: `/api/auth/register`
 - `verifyRegisterRoute`: `/api/auth/verify-register`
 - `loginRoute`: `/api/auth/login`

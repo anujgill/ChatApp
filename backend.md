@@ -59,6 +59,13 @@ MAIL_HOST = smtp.gmail.com
 MAIL_PORT = 587
 ```
 
+> [!IMPORTANT]
+> **Vercel Deployments / Production Environment Variables:**
+> When deploying to Vercel, you must define the variables above in your Vercel Dashboard project settings under **Project Settings > Environment Variables**.
+>
+> **MongoDB Network Access Whitelist:**
+> Because Vercel serverless functions run on dynamic IP addresses, you **MUST** configure the MongoDB Atlas IP Access List to allow access from anywhere (`0.0.0.0/0`). If this is not done, MongoDB Atlas will reject connection attempts from the Vercel serverless functions, leading to query buffer timeouts and `Internal Server Error` messages.
+
 ---
 
 ## 4. Entry Point — `index.js`
@@ -152,3 +159,24 @@ Secures chat messages stored in MongoDB using **AES-256-CBC**.
 - **Decryption**:
   - Tries to split the message string by `:`. If present, parses the IV and decrypts the ciphertext using `crypto.createDecipheriv`.
   - Fallback: If split is not present or decryption fails, falls back to legacy `crypto.createDecipher` using the plain secret key to maintain backward compatibility with old database records.
+
+---
+
+## 8. Error Handling & Troubleshooting
+
+To assist with troubleshooting in production environments (like Vercel serverless functions where viewing logs is not always immediate), the catch blocks in the controllers return the detailed error message in the JSON payload under the `error` property:
+
+- **Example Error Response format:**
+  ```json
+  {
+    "status": false,
+    "msg": "Failed to initiate registration verification. Please check your details.",
+    "error": "Error message description (e.g. SMTP timeout / Mongoose buffering timeout)"
+  }
+  ```
+
+This detailed error behavior is implemented for the following routes:
+- `/api/auth/register` (registration initiation & email OTP verification)
+- `/api/auth/verify-register` (final verification of OTP code)
+- `/api/auth/login` (user login credentials verification)
+- `/api/auth/send-otp` (recovery OTP code delivery)
