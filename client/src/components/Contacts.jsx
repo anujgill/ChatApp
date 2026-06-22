@@ -19,6 +19,20 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
   const [pendingRequests, setPendingRequests] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Returns a valid img src for a base64-encoded SVG avatar, or a fallback placeholder.
+  const getAvatarSrc = (base64) => {
+    if (base64 && base64.length > 10) {
+      return `data:image/svg+xml;base64,${base64}`;
+    }
+    return null;
+  };
+
+  // Fallback: replace broken avatar img with a generic placeholder
+  const handleAvatarError = (e) => {
+    e.target.onerror = null;
+    e.target.src = `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`;
+  };
+
   const toastOptions = {
     position: "bottom-right",
     autoClose: 3000,
@@ -181,8 +195,9 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
                       <div key={user._id} className="contact-item">
                         <div className="avatar">
                           <img
-                            src={`data:image/svg+xml;base64,${user.avatarImage}`}
+                            src={getAvatarSrc(user.avatarImage) || `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`}
                             alt=""
+                            onError={handleAvatarError}
                           />
                           {isOnline && <div className="online-dot"></div>}
                         </div>
@@ -261,8 +276,9 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
                       <div key={req._id} className="contact-item request-item">
                         <div className="avatar">
                           <img
-                            src={`data:image/svg+xml;base64,${req.from.avatarImage}`}
+                            src={getAvatarSrc(req.from.avatarImage) || `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`}
                             alt=""
+                            onError={handleAvatarError}
                           />
                         </div>
                         <div className="username">
@@ -306,8 +322,9 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
                         >
                           <div className="avatar">
                             <img
-                              src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                              src={getAvatarSrc(contact.avatarImage) || `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`}
                               alt=""
+                              onError={handleAvatarError}
                             />
                             {isOnline && <div className="online-dot"></div>}
                           </div>
@@ -331,8 +348,9 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
           <div className="current-user">
             <div className="avatar">
               <img
-                src={`data:image/svg+xml;base64,${currentUser.avatarImage}`}
+                src={getAvatarSrc(currentUser.avatarImage) || `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`}
                 alt="avatar"
+                onError={handleAvatarError}
               />
             </div>
             <div className="username">

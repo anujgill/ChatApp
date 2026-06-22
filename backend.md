@@ -41,7 +41,7 @@ server/
 │   └── messageRoutes.js   # /api/messages/* routes
 └── service/
     ├── encrypt.js         # IV-based AES-256-CBC encrypt/decrypt helpers with fallback
-    └── mailer.js          # Nodemailer SMTP transporter for sending verification codes
+    └── mailer.js          # Resend API HTTP client for sending OTP verification emails
 ```
 
 ---
@@ -52,12 +52,11 @@ server/
 MONGO_URL = <MongoDB Atlas Connection String>
 PORT = 4000
 SECRET_KEY = <AES-256-CBC Key>
-EMAIL = <SMTP Gmail Address>
-PASS_KEY = <SMTP App Password Key>
-MAIL_SERVICE = gmail
-MAIL_HOST = smtp.gmail.com
-MAIL_PORT = 587
+RESEND_API_KEY = <Resend API Key>
 ```
+
+> [!NOTE]
+> The `EMAIL`, `PASS_KEY`, `MAIL_SERVICE`, `MAIL_HOST`, and `MAIL_PORT` variables are no longer used. Email delivery has been migrated from Nodemailer/SMTP to the **Resend API**. Only `RESEND_API_KEY` is required for email functionality.
 
 > [!IMPORTANT]
 > **Vercel Deployments / Production Environment Variables:**
@@ -126,7 +125,7 @@ Stores connection requests for messaging authorization.
 
 | Method | Endpoint | Controller | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | `register` | Initiate registration, send email OTP code |
+| POST | `/api/auth/register` | `register` | Send OTP email via Resend first; only persist unverified user record if email succeeds |
 | POST | `/api/auth/verify-register` | `verifyRegister` | Verify OTP code and verify user account |
 | POST | `/api/auth/login` | `login` | Authenticate username/email & password |
 | POST | `/api/auth/setavatar/:id` | `setAvatar` | Upload/select user profile avatar image |
@@ -162,7 +161,18 @@ Secures chat messages stored in MongoDB using **AES-256-CBC**.
 
 ---
 
-## 8. Error Handling & Troubleshooting
+## 8. Email Service — `service/mailer.js`
+
+Sends OTP verification emails via the **Resend API** (replaces the former Nodemailer/SMTP setup).
+
+- **Transport**: HTTP POST to `https://api.resend.com/emails` using the `RESEND_API_KEY` environment variable.
+- **From address**: `whispr@shergill.codes` (domain verified on Resend dashboard).
+- **Error handling**: If the Resend API returns a non-OK HTTP status, the response body is parsed and a descriptive `Error` is thrown, propagating up to the calling controller's catch block.
+- The exported `sendOTPEmail(email, otp)` function is used by both the `register` and `sendOTP` controllers.
+
+---
+
+## 9. Error Handling & Troubleshooting
 
 To assist with troubleshooting in production environments (like Vercel serverless functions where viewing logs is not always immediate), the catch blocks in the controllers return the detailed error message in the JSON payload under the `error` property:
 
@@ -170,13 +180,13 @@ To assist with troubleshooting in production environments (like Vercel serverles
   ```json
   {
     "status": false,
-    "msg": "Failed to initiate registration verification. Please check your details.",
-    "error": "Error message description (e.g. SMTP timeout / Mongoose buffering timeout)"
+    "msg": "Failed to send verification email. Please check your email address and try again.",
+    "error": "Error message description (e.g. Resend API error / Mongoose buffering timeout)"
   }
   ```
 
 This detailed error behavior is implemented for the following routes:
-- `/api/auth/register` (registration initiation & email OTP verification)
+- `/api/auth/register` (OTP email delivery; user record only saved if email succeeds)
 - `/api/auth/verify-register` (final verification of OTP code)
 - `/api/auth/login` (user login credentials verification)
 - `/api/auth/send-otp` (recovery OTP code delivery)

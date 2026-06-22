@@ -59,7 +59,13 @@ export default function Login() {
             process.env.REACT_APP_CURRENT_USER,
             JSON.stringify(data.user)
           );
-          navigate("/");
+          // If the user registered but dropped before selecting an avatar,
+          // send them back to avatar selection to complete their profile.
+          if (!data.user.isAvatarImageSet) {
+            navigate("/setAvatar");
+          } else {
+            navigate("/");
+          }
         }
       } catch (error) {
         toast.error("Login failed. Please try again.", toastOptions);

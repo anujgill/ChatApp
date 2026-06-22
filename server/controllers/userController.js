@@ -30,7 +30,11 @@ const register = async(req,res,next) => {
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
+    // Send OTP email FIRST — only save the user record if email succeeds.
+    // This prevents orphaned unverified records when email delivery fails.
+    await sendOTPEmail(email, otp);
+
     await User.create({
       email,
       username,
@@ -40,12 +44,10 @@ const register = async(req,res,next) => {
       otpExpiry,
     });
 
-    await sendOTPEmail(email, otp);
-
     return res.json({ status: true, msg: "Verification code sent to your email. Please verify." });
   } catch (error) {
     console.error(error);
-    return res.json({ status: false, msg: "Failed to initiate registration verification. Please check your details.", error: error.message });
+    return res.json({ status: false, msg: "Failed to send verification email. Please check your email address and try again.", error: error.message });
   }
 }
 
@@ -319,6 +321,7 @@ const searchUsers = async (req, res, next) => {
     const users = await User.find({
       username: { $regex: query, $options: "i" },
       _id: { $ne: currentUserId },
+      isVerified: true,
     }).select(["username", "avatarImage", "_id", "email"]);
 
     const userListWithStatus = await Promise.all(

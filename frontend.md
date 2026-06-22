@@ -144,7 +144,10 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
 
 ### 6.2 Login (`Login.jsx`)
 - Matches the split-screen design of the Register page.
-- Collects Username/Email and Password in pill-shaped inputs with outline indicators. Submitting logs in and routes to `/`.
+- Collects Username/Email and Password in pill-shaped inputs with outline indicators.
+- On successful login, checks `isAvatarImageSet` from the server response:
+  - If `false` (user registered but dropped before picking an avatar), redirects to `/setAvatar` to complete profile setup.
+  - If `true`, redirects to `/` (main chat dashboard).
 
 ### 6.3 Forgot Password (`ForgotPassword.jsx`)
 - **Step 1**: Username or email input.
@@ -169,10 +172,13 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
 - **Contact Cards**: Light cream container elements with bottom separators. Selected contact displays light teal background washes and a forest teal left-side indicator border. Displays active user counts and unread message counters.
 - **Online indicator**: Warm amber dots pulsating via CSS keyframes.
 - **Avatar profiles**: Rounded-square frames (`border-radius: 30%`) instead of circular outlines.
+- **Avatar placeholder fallback**: All avatar `<img>` elements have an `onError` handler and a `getAvatarSrc()` guard. If an avatar string is empty, too short, or the image fails to load, a teal "?" SVG placeholder is displayed inline (no broken image icons).
+- **Verified-only search**: The backend `searchUsers` endpoint filters by `isVerified: true`, so abandoned/unverified registration records are never surfaced in search results.
 - **Current user**: Solid sand panel background (`var(--bg-tertiary)`) displayed at the footer of the contacts sidebar.
 
 ### 7.2 Chat Container (`ChatContainer.jsx`)
 - **Header info**: Clean sand-border layout showing rounded-square contact profile, typing state status, and online status. Shows "typing..." in green text when the user's active contact is typing.
+- **Avatar placeholder fallback**: The contact avatar in the chat header has the same `onError` guard as the Contacts sidebar — renders a teal "?" placeholder if the avatar image is missing or fails to load.
 - **Message List**: Bubbles use custom colors:
   - Sent: Solid teal (`var(--color-teal)`) with white text and trailing right-side tail.
   - Received: Sand-cream (`var(--bg-secondary)`) with warm charcoal text and left-side tail.

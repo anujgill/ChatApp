@@ -260,8 +260,16 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
             <div className="user-details">
               <div className="avatar">
                 <img
-                  src={`data:image/svg+xml;base64,${currentChat.avatarImage}`}
+                  src={
+                    currentChat.avatarImage && currentChat.avatarImage.length > 10
+                      ? `data:image/svg+xml;base64,${currentChat.avatarImage}`
+                      : `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`
+                  }
                   alt=""
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#2d6a4f"/><text x="50" y="65" font-size="45" text-anchor="middle" font-family="sans-serif" fill="white">?</text></svg>')}`;
+                  }}
                 />
               </div>
               <div className="username">
