@@ -1,7 +1,10 @@
 const crypto = require('crypto');
 
 function getKey() {
-  const secret = process.env.SECRET_KEY || "five@five@2024";
+  const secret = process.env.SECRET_KEY;
+  if (!secret) {
+    throw new Error("SECRET_KEY environment variable is missing! Please configure it in your .env file or environment settings.");
+  }
   return crypto.createHash('sha256').update(secret).digest();
 }
 
@@ -39,18 +42,10 @@ function decryptMessage(encryptedMessage) {
       }
     }
   } catch (error) {
-    console.warn("New decryption failed, falling back to legacy...");
+    console.error("Decryption failed:", error);
   }
 
-  try {
-    const decipher = crypto.createDecipher('aes-256-cbc', process.env.SECRET_KEY || "five@five@2024");
-    let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf8');
-    decryptedMessage += decipher.final('utf8');
-    return decryptedMessage;
-  } catch (error) {
-    console.error("Legacy decryption failed:", error);
-    return encryptedMessage;
-  }
+  return encryptedMessage;
 }
 
 module.exports = {
