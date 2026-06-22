@@ -1,7 +1,8 @@
 //http://localhost:4000
 //https://api-whispr-messaging.vercel.app/
+//https://chatapp-xzkx.onrender.com/
 
-export const HOST = "https://api-whispr-messaging.vercel.app";
+export const HOST = "https://chatapp-xzkx.onrender.com";
 
 export const registerRoute = `${HOST}/api/auth/register`;
 export const verifyRegisterRoute = `${HOST}/api/auth/verify-register`;
