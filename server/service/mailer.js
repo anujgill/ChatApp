@@ -19,7 +19,7 @@ const sendOTPEmail = async (email, otp) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: `"WhispR Chat Support" <${process.env.EMAIL}>`,
+      from: `"WhispR Chat Support" <whispr@shergill.codes>`,
       to: email,
       subject: "WhispR Password Reset OTP Verification",
       html: `
