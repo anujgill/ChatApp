@@ -11,6 +11,7 @@ import {
 import { AiOutlineCheck, AiOutlineClose, AiOutlineUserAdd } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Logout from "./Logout";
 
 export default function Contacts({ contacts, changeChat, currentUser, onlineUsers, refreshContacts, socket }) {
   const [currentSelected, setCurrentSelected] = useState(undefined);
@@ -356,6 +357,7 @@ export default function Contacts({ contacts, changeChat, currentUser, onlineUser
             <div className="username">
               <h2>{currentUser.username}</h2>
             </div>
+            <Logout socket={socket} />
           </div>
         </Container>
       )}

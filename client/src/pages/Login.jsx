@@ -13,7 +13,7 @@ export default function Login() {
 
   useEffect(() => {
     if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
@@ -62,9 +62,9 @@ export default function Login() {
           // If the user registered but dropped before selecting an avatar,
           // send them back to avatar selection to complete their profile.
           if (!data.user.isAvatarImageSet) {
-            navigate("/setAvatar");
+            navigate("/setAvatar", { replace: true });
           } else {
-            navigate("/");
+            navigate("/", { replace: true });
           }
         }
       } catch (error) {

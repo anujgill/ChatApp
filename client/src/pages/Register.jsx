@@ -13,7 +13,7 @@ export default function Register() {
 
   useEffect(() => {
     if (sessionStorage.getItem(process.env.REACT_APP_CURRENT_USER)) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
@@ -101,7 +101,7 @@ export default function Register() {
           process.env.REACT_APP_CURRENT_USER,
           JSON.stringify(data.user)
         );
-        navigate(`/setAvatar`);
+        navigate(`/setAvatar`, { replace: true });
       }
     } catch (error) {
       toast.error("Verification failed. Please try again.", toastOptions);

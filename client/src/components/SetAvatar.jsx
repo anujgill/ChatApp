@@ -48,7 +48,7 @@ export default function SetAvatar() {
             process.env.REACT_APP_CURRENT_USER,
             JSON.stringify(user)
           );
-          navigate("/");
+          navigate("/", { replace: true });
         } else {
           toast.error("Error setting avatar. Please try again.", toastOptions);
         }
