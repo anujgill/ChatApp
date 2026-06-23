@@ -33,7 +33,7 @@ const register = async(req,res,next) => {
 
     // Send OTP email FIRST — only save the user record if email succeeds.
     // This prevents orphaned unverified records when email delivery fails.
-    await sendOTPEmail(email, otp);
+    await sendOTPEmail(email, otp, "registration");
 
     await User.create({
       email,
@@ -172,7 +172,7 @@ const sendOTP = async (req, res, next) => {
     user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    await sendOTPEmail(user.email, otp);
+    await sendOTPEmail(user.email, otp, "reset");
 
     const maskEmail = (email) => {
       const [local, domain] = email.split("@");
