@@ -116,7 +116,7 @@ const Container = styled.div`
   border-top: 1px solid var(--bg-tertiary);
   padding: 0.8rem 2rem;
 
-  @media screen and (min-width: 720px) and (max-width: 1080px) {
+  @media screen and (max-width: 1080px) {
     padding: 0.8rem 1rem;
   }
 

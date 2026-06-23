@@ -142,7 +142,7 @@ function Chat() {
 
   return (
     <>
-      <Container>
+      <Container $isChatActive={currentChat !== undefined}>
         <div className="container">
           <Contacts 
             currentUser={currentUser} 
@@ -155,7 +155,7 @@ function Chat() {
           {currentChat === undefined ? (
             <Welcome socket={socket}/>
           ) : (
-            <ChatContainer currentUser={currentUser} onlineUsers={onlineUsers} currentChat={currentChat} socket={socket}/>
+            <ChatContainer currentUser={currentUser} onlineUsers={onlineUsers} currentChat={currentChat} socket={socket} changeChat={handleChatChange}/>
           )}
         </div>
       </Container>
@@ -184,6 +184,15 @@ const Container = styled.div`
     
     @media screen and (max-width: 768px) {
       grid-template-columns: 1fr;
+      ${({ $isChatActive }) => $isChatActive ? `
+        & > :first-child {
+          display: none;
+        }
+      ` : `
+        & > :last-child {
+          display: none;
+        }
+      `}
     }
   }
 `;

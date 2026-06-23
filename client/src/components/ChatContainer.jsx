@@ -4,8 +4,9 @@ import ChatInput from "./ChatInput";
 import Logout from "./Logout";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute, markAsReadRoute } from "../utils/Api";
+import { BiArrowBack } from "react-icons/bi";
 
-export default function ChatContainer({currentUser, currentChat, socket, onlineUsers }) {
+export default function ChatContainer({currentUser, currentChat, socket, onlineUsers, changeChat }) {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -258,6 +259,9 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
         <Container>
           <div className="chat-header">
             <div className="user-details">
+              <button className="back-btn" onClick={() => changeChat(undefined)}>
+                <BiArrowBack />
+              </button>
               <div className="avatar">
                 <img
                   src={
@@ -341,8 +345,7 @@ export default function ChatContainer({currentUser, currentChat, socket, onlineU
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 78% 12%;
-  gap: 0.1rem;
+  grid-template-rows: auto 1fr auto;
   overflow: hidden;
   height: 100%;
   background-color: var(--bg-primary);
@@ -351,16 +354,42 @@ const Container = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
+    padding: 0.8rem 2rem;
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--bg-tertiary);
     box-shadow: var(--shadow-sm);
     z-index: 5;
 
+    @media screen and (max-width: 768px) {
+      padding: 0.8rem 1rem;
+    }
+
     .user-details {
       display: flex;
       align-items: center;
       gap: 1rem;
+
+      .back-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.2rem;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: var(--color-teal);
+        }
+        
+        @media screen and (max-width: 768px) {
+          display: flex;
+        }
+      }
+
       .avatar {
         img {
           height: 2.6rem;
@@ -474,6 +503,11 @@ const Container = styled.div`
       flex-direction: column;
       gap: 1.2rem;
       overflow: auto;
+
+      @media screen and (max-width: 768px) {
+        padding: 1rem;
+        gap: 0.8rem;
+      }
     }
 
     .message {
@@ -488,6 +522,9 @@ const Container = styled.div`
         box-shadow: var(--shadow-sm);
         @media screen and (min-width: 720px) and (max-width: 1080px) {
           max-width: 75%;
+        }
+        @media screen and (max-width: 768px) {
+          max-width: 85%;
         }
         p {
           white-space: pre-wrap;

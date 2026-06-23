@@ -515,7 +515,7 @@ const Container = styled.div`
         .online-dot {
           width: 8px;
           height: 8px;
-          background-color: var(--color-amber);
+          background-color: var(--color-green);
           border-radius: 50%;
           position: absolute;
           bottom: -2px;
@@ -527,13 +527,13 @@ const Container = styled.div`
 
       @keyframes pulsate {
         0% {
-          box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.7);
+          box-shadow: 0 0 0 0 rgba(56, 176, 0, 0.7);
         }
         70% {
-          box-shadow: 0 0 0 5px rgba(212, 165, 116, 0);
+          box-shadow: 0 0 0 5px rgba(56, 176, 0, 0);
         }
         100% {
-          box-shadow: 0 0 0 0 rgba(212, 165, 116, 0);
+          box-shadow: 0 0 0 0 rgba(56, 176, 0, 0);
         }
       }
 
