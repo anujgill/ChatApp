@@ -197,3 +197,19 @@ This detailed error behavior is implemented for the following routes:
 - `/api/auth/verify-register` (final verification of OTP code)
 - `/api/auth/login` (user login credentials verification)
 - `/api/auth/send-otp` (recovery OTP code delivery)
+
+---
+
+## 10. Session Management & Socket Mapping
+
+WhispR backend is stateless, relying on the client to store the authenticated session user object and present it for verification. The backend implements active session checking and real-time mapping via Socket.IO:
+
+- **Bcrypt Password Verification**: The `/api/auth/login` route verifies incoming passwords by running `bcrypt.compare` against the Mongoose `User` password hash. If verified, the server responds with user details which the client writes to its `sessionStorage`.
+- **Live User Tracking**: The server boots Socket.IO on startup. It exposes live session lifecycle listeners:
+  - **`add-user`**: Fired by the client immediately after mounting the chat view (using the stored user ID). Maps `userId` to `socket.id` inside the in-memory `global.onlineUsers` Map.
+  - **`disconnect`**: Cleans up the `onlineUsers` Map when the user's socket closes (e.g. closing browser, tab, or navigating away), and broadcasts `reload` to trigger status refreshes on other connected clients.
+- **Real-Time Event Relaying**: Online status indicators and message/typing events rely on matching the target user ID to an active socket ID in the `onlineUsers` Map:
+  - Sent messages are pushed via socket using `send-msg` -> `msg-recieve` event relay.
+  - User typing actions are pushed via `setType` -> `typeStatus` event relay.
+- **Session Cleanup**: The `/api/auth/logout/:id` endpoint deletes the user ID mapping from the `onlineUsers` Map and disconnects the client socket connection securely.
+

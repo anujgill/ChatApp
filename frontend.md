@@ -146,8 +146,8 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
 - Matches the split-screen design of the Register page.
 - Collects Username/Email and Password in pill-shaped inputs with outline indicators.
 - On successful login, checks `isAvatarImageSet` from the server response:
-  - If `false` (user registered but dropped before picking an avatar), redirects to `/setAvatar` to complete profile setup.
-  - If `true`, redirects to `/` (main chat dashboard).
+  - If `false` (user registered but dropped before picking an avatar), redirects to `/setAvatar` to complete profile setup using `{ replace: true }`.
+  - If `true`, redirects to `/` (main chat dashboard) using `{ replace: true }` to pop the auth screens from the navigation history stack.
 
 ### 6.3 Forgot Password (`ForgotPassword.jsx`)
 - **Step 1**: Username or email input.
@@ -157,7 +157,8 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
 
 ### 6.4 Chat Dashboard (`Chat.jsx`)
 - **Full Viewport Layout**: Edge-to-edge layout filling 100vh and 100vw, eliminating centered overlay cards and neon background glow orbs.
-- **Grid Structure**: Column splits set to `340px` (contacts panel) and `1fr` (chat space). Responsive layouts collapse to `1fr` on small viewports.
+- **Grid Structure**: Column splits set to `340px` (contacts panel) and `1fr` (chat space).
+- **Responsive Layout Toggle**: On small viewports (width <= 768px), the layout collapses to `1fr` and conditionally shows either the contacts list OR the active chat pane based on the transient styled-component prop `$isChatActive`.
 
 ---
 
@@ -170,14 +171,17 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
   - Integrates user search results with actionable request buttons: showing "Add User" (sends a request), "Pending" (if request was sent), or "Connected" based on search query status.
   - Relays request/response events via sockets in real-time (`send-request` and `request-response`).
 - **Contact Cards**: Light cream container elements with bottom separators. Selected contact displays light teal background washes and a forest teal left-side indicator border. Displays active user counts and unread message counters.
-- **Online indicator**: Warm amber dots pulsating via CSS keyframes.
+- **Online indicator**: Vibrant green dots (`var(--color-green)`) pulsating via CSS keyframes (`rgba(56, 176, 0)`).
 - **Avatar profiles**: Rounded-square frames (`border-radius: 30%`) instead of circular outlines.
 - **Avatar placeholder fallback**: All avatar `<img>` elements have an `onError` handler and a `getAvatarSrc()` guard. If an avatar string is empty, too short, or the image fails to load, a teal "?" SVG placeholder is displayed inline (no broken image icons).
 - **Verified-only search**: The backend `searchUsers` endpoint filters by `isVerified: true`, so abandoned/unverified registration records are never surfaced in search results.
-- **Current user**: Solid sand panel background (`var(--bg-tertiary)`) displayed at the footer of the contacts sidebar.
+- **Current user & Sidebar Logout**: Solid sand panel background (`var(--bg-tertiary)`) displayed at the footer of the contacts sidebar, which integrates the `Logout` power-off button on the right side for easy access on both desktop and mobile views.
 
 ### 7.2 Chat Container (`ChatContainer.jsx`)
 - **Header info**: Clean sand-border layout showing rounded-square contact profile, typing state status, and online status. Shows "typing..." in green text when the user's active contact is typing.
+- **Mobile Back Button**: Integrates a `BiArrowBack` back arrow button in the header on mobile viewports (width <= 768px). Clicking it triggers the `changeChat(undefined)` callback to return to the contact list view.
+- **Dynamic Flex/Grid Layout**: Restructured the container styling to use `grid-template-rows: auto 1fr auto` to prevent distortion on keyboard resize or small height devices.
+- **Mobile Spacing Optimizations**: Reduces chat header vertical padding to `0.8rem 1rem`, sets message bubble `max-width` to `85%` for better reading, and reduces margins inside the scroll wrapper.
 - **Avatar placeholder fallback**: The contact avatar in the chat header has the same `onError` guard as the Contacts sidebar — renders a teal "?" placeholder if the avatar image is missing or fails to load.
 - **Message List**: Bubbles use custom colors:
   - Sent: Solid teal (`var(--color-teal)`) with white text and trailing right-side tail.
@@ -215,3 +219,16 @@ Maps endpoints to `HOST` (e.g., `http://localhost:4000` or the production Vercel
 ### 7.5 Logout (`Logout.jsx`)
 - Power button styled in terracotta tints (`var(--color-terracotta)`), expanding to reveal text on hover.
 - Modal overlay displays a clean light-cream dialog panel containing cancel/confirm actions.
+
+---
+
+## 11. Session Management & Authentication
+
+WhispR maintains user sessions securely on the client and correlates them with real-time socket connections on the backend:
+
+- **Client Session Persistence**: Logged-in user information (JSON object including username, ID, and avatar details) is stored in the browser's `sessionStorage` under the key parsed from the environment configuration `process.env.REACT_APP_CURRENT_USER`.
+- **Navigation Guarding**:
+  - Main router/dashboard components check `sessionStorage.getItem()` inside `useEffect` blocks. If no user object is found, they trigger an immediate redirect to `/login`.
+  - Auth routes (`/login`, `/register`) check for the presence of the session user and automatically redirect active sessions to the home `/` chat path using `navigate("/", { replace: true })` to pop the auth screens from the navigation history stack.
+- **Socket Association**: Upon loading the main dashboard, the client connects to the Socket.IO server and emits `add-user` with their unique database ID. The server registers this ID alongside the socket connection ID in a global `onlineUsers` Map.
+- **Session Destruction**: Triggering logout clears the local `sessionStorage` completely, calls the `/api/auth/logout/:id` endpoint on the server to remove socket/online mapping details, disconnects the socket client, and redirects to `/login`.
