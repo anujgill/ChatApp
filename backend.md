@@ -163,12 +163,19 @@ Secures chat messages stored in MongoDB using **AES-256-CBC**.
 
 ## 8. Email Service — `service/mailer.js`
 
-Sends OTP verification emails via the **Resend API** (replaces the former Nodemailer/SMTP setup).
+Sends OTP emails via the **Resend API** using native `fetch`. Nodemailer/SMTP has been fully removed.
 
 - **Transport**: HTTP POST to `https://api.resend.com/emails` using the `RESEND_API_KEY` environment variable.
 - **From address**: `whispr@shergill.codes` (domain verified on Resend dashboard).
 - **Error handling**: If the Resend API returns a non-OK HTTP status, the response body is parsed and a descriptive `Error` is thrown, propagating up to the calling controller's catch block.
-- The exported `sendOTPEmail(email, otp)` function is used by both the `register` and `sendOTP` controllers.
+
+### Exported Functions
+
+| Function | Used by | Email subject | Email body highlights |
+|---|---|---|---|
+| `sendRegistrationOTPEmail(email, otp)` | `register` controller | "WhispR – Verify Your Email Address" | 👋 Welcome header, "Thanks for signing up" copy, grey safety note |
+| `sendPasswordResetOTPEmail(email, otp)` | `sendOTP` controller | "WhispR – Password Reset OTP Verification" | 🔐 Password Recovery header, red security-notice banner |
+| `sendOTPEmail(email, otp, purpose)` | Both controllers | Delegates to one of the above | Routes to registration or reset template based on `purpose` (`"registration"` \| `"reset"`, defaults `"reset"`) |
 
 ---
 
